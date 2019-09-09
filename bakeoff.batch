@@ -1,0 +1,1229 @@
+#
+# These tests require six hosts connected in succession, one client,
+# four middleboxes and one server:
+#
+# C (SCE):
+#     role: client / sender
+#     kernel: SCE
+#     software: flent, netperf, fping
+#     sysctl: net.ipv4.tcp_ecn = 1
+# C (L4S):
+#     role: client / sender
+#     kernel: L4S (tcp-prague)
+#     software: flent, netperf, fping
+#     sysctl: net.ipv4.tcp_ecn = 3
+# M1:
+#     role: middlebox
+#     kernel: L4S (sch_dualpi2)
+#     sysctl: net.ipv4.ip_forward = 1
+# M2:
+#     role: middlebox
+#     kernel: SCE
+#     sysctl: net.ipv4.ip_forward = 1
+# M3:
+#     role: middlebox
+#     kernel: L4S (sch_dualpi2)
+#     sysctl: net.ipv4.ip_forward = 1
+# M4:
+#     role: middlebox
+#     kernel: SCE
+#     sysctl: net.ipv4.ip_forward = 1
+# S (SCE):
+#     role: server / receiver
+#     kernel: SCE
+#     software: netserver
+#     sysctl: net.ipv4.tcp_sce = 1
+# S (L4S):
+#     role: server / receiver
+#     kernel: L4S (tcp-prague)
+#     software: netserver
+#     sysctl: net.ipv4.tcp_ecn = 3
+#
+
+# Global settings
+[Batch::global]
+# Change below to suit the environment (also see sce and l4s sections)
+m1_ssh = pete@m1
+m1_left_iface = ens192
+m1_right_iface = ens224
+m2_ssh = pete@m2
+m2_left_iface = ens192
+m2_right_iface = ens224
+m3_ssh = pete@m3
+m3_left_iface = ens192
+m3_right_iface = ens224
+m4_ssh = pete@m4
+m4_left_iface = ens192
+m4_right_iface = ens224
+# Don't need to change below here
+abstract = yes
+m1_ifaces = ${m1_left_iface},${m1_right_iface}
+m2_ifaces = ${m2_left_iface},${m2_right_iface}
+m3_ifaces = ${m3_left_iface},${m3_right_iface}
+m4_ifaces = ${m4_left_iface},${m4_right_iface}
+batch_title = bakeoff
+output_path = ${batch_title}-${batch_time}/${batch_name}
+socket_stats = yes
+length = 60
+commands = clear, setup, teardown, process
+repetitions = 1
+pause = 5
+extended_metadata = yes
+debug_error = yes
+debug_log = yes
+ip_version = 4
+plot_title = SCE-L4S Bakeoff Scenario ${scenario} \(${draft_name}\)
+endpoint_setup = ${c_ssh} \
+		\"tcp_metrics\; \
+		run_tcpdump ${c_right_iface}\; \
+		plot ${output_path}/${data_filename} \\\"${plot_title}\\\" \\\"${plot_subtitle}\\\"\; \
+		run_scetrace ${output_path}\; \
+		compress ${output_path}\" \
+	${s_ssh} \"tcp_metrics\; run_tcpdump ${s_left_iface}\"
+
+# SCE settings
+[Batch::sce]
+abstract = yes
+c_ssh = pete@c1
+c_right_iface = ens192
+s_ssh = pete@s1
+s_left_iface = ens192
+hosts = ts1
+draft_name = SCE
+
+# L4S settings
+[Batch::l4s]
+abstract = yes
+c_ssh = pete@c2
+c_right_iface = ens192
+s_ssh = pete@s2
+s_left_iface = ens192
+hosts = ts2
+draft_name = L4S
+
+# One-flow test settings
+[Batch::one-flow]
+abstract = yes
+test_name = tcp_1up
+for_bandwidth_delay = 50Mbit_0ms, 50Mbit_10ms, 50Mbit_80ms
+title = b:${batch_name} cc:${cc} q:${queueing} bw:${bandwidth} rtt:${rtt_delay}
+test_parameters = tcp_cong_control=${cc};
+filename_extra = ${cc}-${bandwidth}-${rtt_delay}
+ 
+[Batch::one-flow-l4s]
+abstract = yes
+inherits = one-flow, l4s
+for_cc = cubic, dctcp, prague
+
+[Batch::one-flow-sce]
+abstract = yes
+inherits = one-flow, sce
+for_cc = cubic, dctcp-sce, reno-sce
+
+# Two-flow test settings
+[Batch::two-flow]
+abstract = yes
+test_name = tcp_2up
+for_bandwidth_delay = 50Mbit_0ms, 50Mbit_10ms, 50Mbit_80ms
+title = b:${batch_name} vs:${vs} q:${queueing} bw:${bandwidth} rtt:${rtt_delay}
+test_parameters = cc_algos="${cc_algos}"; stream_delays="0,10"; \
+	ping_hosts="${hosts},${hosts}"; ping_markings="0,1";
+filename_extra = ${vs}-${bandwidth}-${rtt_delay}
+
+[Batch::two-flow-l4s]
+abstract = yes
+inherits = two-flow, l4s
+for_vs = cubic-vs-cubic,
+	prague-vs-prague,
+	cubic-vs-prague
+
+[Batch::two-flow-sce]
+abstract = yes
+inherits = two-flow, sce
+for_vs = cubic-vs-cubic,
+	reno-sce-vs-reno-sce,
+	cubic-vs-reno-sce
+
+##########
+#
+# Scenario 1
+#
+# This is simply a sanity check to make sure the tools worked.
+#
+
+# L4S 1: Sender → L4S middlebox (bottleneck) → L4S Receiver
+[Batch::l4s-s1]
+abstract = yes
+inherits = global
+scenario = 1
+plot_subtitle = Sender → L4S middlebox \(bottleneck\) → L4S Receiver
+queueing = htb(${bandwidth})+dualpi2
+setup_args = ${endpoint_setup} \
+	${m3_ssh} \
+		\"htb_qdisc ${m3_ifaces} ${bandwidth} dualpi2\; \
+		netem ${m3_ifaces} ${netem_args}\"
+
+[Batch::l4s-s1-1]
+inherits = one-flow-l4s, l4s-s1
+
+[Batch::l4s-s1-2]
+inherits = two-flow-l4s, l4s-s1
+
+# SCE 1: Sender → SCE middlebox (bottleneck) → SCE Receiver
+[Batch::sce-s1]
+abstract = yes
+inherits = global
+scenario = 1
+plot_subtitle = Sender → SCE middlebox \(bottleneck\) → SCE Receiver
+queueing = cake(${bandwidth} 1q)
+setup_args = ${endpoint_setup} \
+	${m2_ssh} \
+		\"root_qdisc ${m2_ifaces} cake bandwidth ${bandwidth} sce flowblind besteffort\; \
+		netem ${m2_ifaces} ${netem_args}\"
+
+[Batch::sce-s1-1]
+inherits = one-flow-sce, sce-s1
+
+[Batch::sce-s1-2]
+inherits = two-flow-sce, sce-s1
+
+##########
+#
+# Scenario 2
+#
+# This is the most favourable-to-L4S topology that incorporates a non-L4S
+# component that we could easily come up with.
+#
+
+# L4S 2: Sender → FQ-AQM middlebox (bottleneck) → L4S middlebox → L4S receiver
+[Batch::l4s-s2]
+abstract = yes
+inherits = global
+scenario = 2
+plot_subtitle = Sender → FQ-AQM middlebox \(bottleneck\) → L4S middlebox → L4S receiver
+queueing = htb(${bandwidth})+fq_codel→dualpi2
+setup_args = ${endpoint_setup} \
+	${m2_ssh} \
+		\"htb_qdisc ${m2_ifaces} ${bandwidth} fq_codel\; \
+		netem ${m2_ifaces} ${netem_args}\" \
+	${m3_ssh} \
+		\"root_qdisc ${m3_ifaces} dualpi2\"
+
+[Batch::l4s-s2-1]
+inherits = one-flow-l4s, l4s-s2
+
+[Batch::l4s-s2-2]
+inherits = two-flow-l4s, l4s-s2
+
+# SCE 2: Sender → FQ-AQM middlebox (bottleneck) → SCE middlebox → SCE receiver
+[Batch::sce-s2]
+abstract = yes
+inherits = global
+scenario = 2
+plot_subtitle = Sender → FQ-AQM middlebox \(bottleneck\) → SCE middlebox → SCE receiver
+queueing = htb(${bandwidth})+fq_codel→cake(fq)
+setup_args = ${endpoint_setup} \
+	${m1_ssh} \
+		\"htb_qdisc ${m1_ifaces} ${bandwidth} fq_codel\; \
+		netem ${m1_ifaces} ${netem_args}\" \
+	${m2_ssh} \
+		\"root_qdisc ${m2_ifaces} cake sce flows besteffort\"
+
+[Batch::sce-s2-1]
+inherits = one-flow-sce, sce-s2
+
+[Batch::sce-s2-2]
+inherits = two-flow-sce, sce-s2
+
+##########
+#
+# Scenario 3
+#
+# This is the topology of most concern, and is obtained from topology 2 by
+# simply changing a parameter on our middlebox.
+#
+
+# L4S: Sender → single-AQM middlebox (bottleneck) → L4S middlebox → L4S receiver
+[Batch::l4s-s3]
+abstract = yes
+inherits = global
+scenario = 3
+plot_subtitle = Sender → single-AQM middlebox \(bottleneck\) → L4S middlebox → L4S receiver
+queueing = htb(${bandwidth})+fq_codel(1q)→dualpi2
+setup_args = ${endpoint_setup} \
+	${m2_ssh} \
+		\"htb_qdisc ${m2_ifaces} ${bandwidth} fq_codel flows 1\; \
+		netem ${m2_ifaces} ${netem_args}\" \
+	${m3_ssh} \
+		\"root_qdisc ${m3_ifaces} dualpi2\"
+
+[Batch::l4s-s3-1]
+inherits = one-flow-l4s, l4s-s3
+
+[Batch::l4s-s3-2]
+inherits = two-flow-l4s, l4s-s3
+
+# SCE: Sender → single-AQM middlebox (bottleneck) → SCE middlebox → SCE receiver
+[Batch::sce-s3]
+abstract = yes
+inherits = global
+scenario = 3
+plot_subtitle = Sender → single-AQM middlebox \(bottleneck\) → SCE middlebox → SCE receiver
+queueing = htb(${bandwidth})+fq_codel(1q)→cake(fq)
+setup_args = ${endpoint_setup} \
+	${m1_ssh} \
+		\"htb_qdisc ${m1_ifaces} ${bandwidth} fq_codel flows 1\; \
+		netem ${m1_ifaces} ${netem_args}\" \
+	${m2_ssh} \
+		\"root_qdisc ${m2_ifaces} cake sce flows besteffort\"
+
+[Batch::sce-s3-1]
+inherits = one-flow-sce, sce-s3
+
+[Batch::sce-s3-2]
+inherits = two-flow-sce, sce-s3
+
+##########
+#
+# Scenario 4
+#
+# Exploring what happens if an adversary tries to game the system.  We could
+# also try an ECT(0) mangler or a Not-ECT mangler, in the same spirit.
+#
+
+# L4S: Sender → ECT(1) mangler → L4S middlebox (bottleneck) → L4S receiver
+[Batch::l4s-s4]
+abstract = yes
+inherits = global
+scenario = 4
+plot_subtitle = Sender → ECT\(1\) mangler → L4S middlebox \(bottleneck\) → L4S receiver
+queueing = htb(${bandwidth})+dualpi2
+
+[Batch::l4s-s4-1]
+inherits = one-flow-l4s, l4s-s4
+setup_args = ${endpoint_setup} \
+	${m2_ssh} \
+		\"set_tos ${m2_right_iface} 0x1\" \
+	${m3_ssh} \
+		\"htb_qdisc ${m3_ifaces} ${bandwidth} dualpi2\; \
+		netem ${m3_ifaces} ${netem_args}\"
+
+[Batch::l4s-s4-2]
+inherits = two-flow-l4s, l4s-s4
+for_vs = cubic-vs-cubic,
+	cubic-vs-cubic_gamed,
+	prague-vs-cubic,
+	prague-vs-cubic_gamed
+test_parameters = cc_algos="${cc_algos}"; stream_delays="0,10"; \
+	ping_hosts="${hosts},${hosts}"; ping_markings="0,1"; \
+	markings="${markings}";
+setup_args = ${endpoint_setup} \
+	${m2_ssh} \
+		\"dscp_to_tos ${m2_right_iface} 1 1\" \
+	${m3_ssh} \
+		\"htb_qdisc ${m3_ifaces} ${bandwidth} dualpi2\; \
+		netem ${m3_ifaces} ${netem_args}\"
+
+# SCE: Sender → ECT(1) mangler → SCE middlebox (bottleneck) → SCE receiver
+[Batch::sce-s4]
+abstract = yes
+inherits = global
+scenario = 4
+plot_subtitle = Sender → ECT\(1\) mangler → SCE middlebox \(bottleneck\) → SCE receiver
+queueing = cake(${bandwidth} fq)
+
+[Batch::sce-s4-1]
+inherits = one-flow-sce, sce-s4
+setup_args = ${endpoint_setup} \
+	${m1_ssh} \
+		\"set_tos ${m1_right_iface} 0x1\" \
+	${m2_ssh} \
+		\"root_qdisc ${m2_ifaces} cake bandwidth ${bandwidth} sce flows besteffort\; \
+		netem ${m2_ifaces} ${netem_args}\"
+
+[Batch::sce-s4-2]
+inherits = two-flow-sce, sce-s4
+for_vs = cubic-vs-cubic_gamed,
+	cubic-vs-reno-sce_gamed,
+	reno-sce-vs-reno-sce_gamed
+test_parameters = cc_algos="${cc_algos}"; stream_delays="0,10"; \
+	ping_hosts="${hosts},${hosts}"; ping_markings="0,1"; \
+	markings="${markings}";
+setup_args = ${endpoint_setup} \
+	${m1_ssh} \
+		\"dscp_to_tos ${m1_right_iface} 1 1\" \
+	${m2_ssh} \
+		\"root_qdisc ${m2_ifaces} cake bandwidth ${bandwidth} sce flows besteffort\; \
+		netem ${m3_ifaces} ${netem_args}\"
+
+
+##########
+#
+# Scenario 5
+#
+# This is Sebastian's scenario.  We had some discussion yesterday about the
+# propensity of existing senders to produce line-rate bursts occasionally, and
+# the way these bursts could collect in *all* of the queues at successively
+# decreasing bottlenecks.  This is a test which explores that scenario and
+# measures its effects, and is highly relevant to best consumer practice on
+# today's Internet.
+#
+
+# L4S: Sender → L4S middlebox (bottleneck 1) → FIFO (bottleneck 2) →
+#    FQ-AQM middlebox (bottleneck 3) → L4S receiver
+[Batch::l4s-s5]
+abstract = yes
+inherits = global
+scenario = 5
+plot_subtitle = Sender → L4S mdlbox \(btlneck 1\) → FIFO \(btlneck 2\) → FQ-AQM mdlbox \(btlneck 3\) → L4S rcvr
+bandwidth0 = 100Mbit
+bandwidth1 = 47.5Mbit
+queueing = htb(${bandwidth0})+dualpi2→htb(${bandwidth})+pfifo→htb(${bandwidth1})+fq_codel
+setup_args = ${endpoint_setup} \
+	${m1_ssh} \
+		\"htb_qdisc ${m1_ifaces} ${bandwidth0} dualpi2\" \
+	${m2_ssh} \
+		\"htb_qdisc ${m2_ifaces} ${bandwidth} pfifo_fast\; \
+		netem ${m2_ifaces} ${netem_args}\" \
+	${m4_ssh} \
+		\"htb_qdisc ${m4_ifaces} ${bandwidth1} fq_codel\"
+
+[Batch::l4s-s5-1]
+inherits = one-flow-l4s, l4s-s5
+
+[Batch::l4s-s5-2]
+inherits = two-flow-l4s, l4s-s5
+
+# SCE: Sender → SCE middlebox (bottleneck 1) → FIFO (bottleneck 2) →
+#    FQ-AQM middlebox (bottleneck 3) → SCE receiver
+[Batch::sce-s5]
+abstract = yes
+inherits = global
+scenario = 5
+plot_subtitle = Sender → SCE mdlbox \(btlneck 1\) → FIFO \(btlneck 2\) → FQ-AQM mdlbox \(btlneck 3\) → SCE rcvr
+bandwidth0 = 100Mbit
+bandwidth1 = 47.5Mbit
+queueing = cake(${bandwidth0} fq)→htb(${bandwidth})+pfifo→htb(${bandwidth1})+fq_codel
+setup_args = ${endpoint_setup} \
+	${m2_ssh} \
+		\"root_qdisc ${m2_ifaces} ${bandwidth0} cake bandwidth ${bandwidth0} sce flows besteffort\" \
+	${m3_ssh} \
+		\"htb_qdisc ${m3_ifaces} ${bandwidth} pfifo_fast\; \
+		netem ${m3_ifaces} ${netem_args}\" \
+	${m4_ssh} \
+		\"htb_qdisc ${m4_ifaces} ${bandwidth1} fq_codel\"
+
+[Batch::sce-s5-1]
+inherits = one-flow-sce, sce-s5
+
+[Batch::sce-s5-2]
+inherits = two-flow-sce, sce-s5
+
+##########
+#
+# Scenario 6
+#
+# Correct behaviour would show a brief latency peak caused by the interaction
+# of slow-start with the FIFO in the subject topology, or no peak at all for
+# the control topology; you should see this for whichever RFC-3168 flow is
+# chosen as the control. Expected results with L4S in the subject topology,
+# however, are a peak extending about 4 seconds before returning to baseline.
+
+# L4S: Sender → Delay → Dumb FIFO (bottleneck 1) → FQ-AQM middlebox (bottleneck 2) → L4S receiver
+[Batch::l4s-s6]
+abstract = yes
+inherits = global
+scenario = 6
+plot_subtitle = Sender → Delay → Dumb FIFO \(btlneck 1\) → FQ-AQM middlebox \(btlneck 2\) → L4S receiver
+bandwidth0 = 52.5Mbit
+queueing = htb(${bandwidth0})+pfifo→htb(${bandwidth})+fq_codel
+setup_args = ${endpoint_setup} \
+	${m1_ssh} \
+		\"netem ${m1_ifaces} ${netem_args}\" \
+	${m3_ssh} \
+		\"htb_qdisc ${m3_ifaces} ${bandwidth0} pfifo_fast\" \
+	${m4_ssh} \
+		\"htb_qdisc ${m4_ifaces} ${bandwidth} fq_codel\"
+
+[Batch::l4s-s6-1]
+inherits = one-flow-l4s, l4s-s6
+
+[Batch::l4s-s6-2]
+inherits = two-flow-l4s, l4s-s6
+
+# SCE: Sender → Delay → Dumb FIFO (bottleneck 1) → FQ-AQM middlebox (bottleneck 2) → SCE receiver
+[Batch::sce-s6]
+abstract = yes
+inherits = global
+scenario = 6
+plot_subtitle = Sender → Delay → Dumb FIFO \(btlneck 1\) → FQ-AQM middlebox \(btlneck 2\) → L4S receiver
+bandwidth0 = 52.5Mbit
+queueing = htb(${bandwidth0})+pfifo→htb(${bandwidth})+fq_codel
+setup_args = ${endpoint_setup} \
+	${m1_ssh} \
+		\"netem ${m1_ifaces} ${netem_args}\" \
+	${m3_ssh} \
+		\"htb_qdisc ${m3_ifaces} ${bandwidth0} pfifo_fast\" \
+	${m4_ssh} \
+		\"htb_qdisc ${m4_ifaces} ${bandwidth} fq_codel\"
+
+[Batch::sce-s6-1]
+inherits = one-flow-sce, sce-s6
+
+[Batch::sce-s6-2]
+inherits = two-flow-sce, sce-s6
+
+
+# Commands
+[Command::clear]
+exec = ./commands.sh flent_clear ${c_ssh},${m1_ssh},${m2_ssh},${m3_ssh},${m4_ssh},${s_ssh}
+type = pre
+essential = yes
+
+[Command::setup]
+exec = ./commands.sh flent_setup "${output_path}/${data_filename}" ${setup_args}
+type = pre
+essential = yes
+
+[Command::teardown]
+exec = ./commands.sh flent_teardown "${output_path}/${data_filename}" ${setup_args}
+type = post
+
+[Command::process]
+exec = ./commands.sh flent_process "${output_path}/${data_filename}" ${setup_args}
+type = post
+
+# ToS args
+
+[Arg::tos_default]
+tos = ecn_default
+tos_val = 
+
+[Arg::tos_ect1]
+tos = ect1
+tos_val = 0x1
+
+# Test args
+
+[Arg::tcp_1up]
+test_name = tcp_1up
+
+[Arg::tcp_2up]
+test_name = tcp_2up
+
+# CC args
+
+[Arg::prague]
+cc = prague
+
+[Arg::cubic]
+cc = cubic
+
+[Arg::cubic-sce]
+cc = cubic-sce
+
+[Arg::reno]
+cc = reno
+
+[Arg::reno-sce]
+cc = reno-sce
+
+[Arg::dctcp]
+cc = dctcp
+
+[Arg::dctcp-sce]
+cc = dctcp-sce
+
+# Queueing args
+
+[Arg::flowblind]
+queueing = single
+flowiso = flowblind
+
+[Arg::sce-single]
+queueing = sce-single
+flowiso = flowblind
+sce = sce-single
+
+[Arg::sce-thresh-4]
+queueing = sce-thresh-4
+flowiso = flowblind
+sce = sce-thresh 4
+
+[Arg::sce-thresh-8]
+queueing = sce-thresh-8
+flowiso = flowblind
+sce = sce-thresh 8
+
+[Arg::sce-thresh-12]
+queueing = sce-thresh-12
+flowiso = flowblind
+sce = sce-thresh 12
+
+[Arg::sce-thresh-16]
+queueing = sce-thresh-16
+flowiso = flowblind
+sce = sce-thresh 16
+
+[Arg::sce-thresh-20]
+queueing = sce-thresh-20
+flowiso = flowblind
+sce = sce-thresh 20
+
+[Arg::sce-thresh-24]
+queueing = sce-thresh-24
+flowiso = flowblind
+sce = sce-thresh 24
+
+[Arg::sce-thresh-32]
+queueing = sce-thresh-32
+flowiso = flowblind
+sce = sce-thresh 32
+
+[Arg::triple-isolate]
+queueing = fair
+flowiso = triple-isolate
+
+# SCE Feedback Mode args
+[Arg::dithered]
+sce_feedback_mode = 0
+
+[Arg::advanced]
+sce_feedback_mode = 1
+
+# CC 'vs' args
+
+[Arg::cubic-vs-cubic]
+vs = cubic-vs-cubic
+cc_algos = cubic,cubic
+markings = 0,0
+
+[Arg::cubic-vs-cubic_gamed]
+vs = cubic-vs-cubic_gamed
+cc_algos = cubic,cubic
+markings = 0,4
+
+[Arg::cubic-vs-cubic-sce]
+vs = cubic-vs-cubic-sce
+cc_algos = cubic,cubic-sce
+
+[Arg::cubic-vs-prague]
+vs = cubic-vs-prague
+cc_algos = cubic,prague
+
+[Arg::cubic-vs-reno]
+vs = cubic-vs-reno
+cc_algos = cubic,reno
+
+[Arg::cubic-vs-reno-sce]
+vs = cubic-vs-reno-sce
+cc_algos = cubic,reno-sce
+
+[Arg::cubic-vs-reno-sce_gamed]
+vs = cubic-vs-reno-sce_gamed
+cc_algos = cubic,reno-sce
+markings = 0,4
+
+[Arg::cubic-vs-dctcp]
+vs = cubic-vs-dctcp
+cc_algos = cubic,dctcp
+
+[Arg::cubic-vs-dctcp-sce]
+vs = cubic-vs-dctcp-sce
+cc_algos = cubic,dctcp-sce
+
+[Arg::cubic-sce-vs-cubic-sce]
+vs = cubic-sce-vs-cubic-sce
+cc_algos = cubic-sce,cubic-sce
+
+[Arg::cubic-sce-vs-reno]
+vs = cubic-sce-vs-reno
+cc_algos = cubic-sce,reno
+
+[Arg::cubic-sce-vs-reno-sce]
+vs = cubic-sce-vs-reno-sce
+cc_algos = cubic-sce,reno-sce
+
+[Arg::cubic-sce-vs-dctcp]
+vs = cubic-sce-vs-dctcp
+cc_algos = cubic-sce,dctcp
+
+[Arg::cubic-sce-vs-dctcp-sce]
+vs = cubic-sce-vs-dctcp-sce
+cc_algos = cubic-sce,dctcp-sce
+
+[Arg::prague-vs-prague]
+vs = prague-vs-prague
+cc_algos = prague,prague
+
+[Arg::prague-vs-cubic]
+vs = prague-vs-cubic
+cc_algos = prague,cubic
+markings = 0,0
+
+[Arg::prague-vs-cubic_gamed]
+vs = prague-vs-cubic_gamed
+cc_algos = prague,cubic
+markings = 0,4
+
+[Arg::reno-sce-vs-cubic]
+vs = reno-sce-vs-cubic
+cc_algos = reno-sce,cubic
+markings = 0,0
+
+[Arg::reno-sce-vs-cubic_gamed]
+vs = reno-sce-vs-cubic_gamed
+cc_algos = reno-sce,cubic
+markings = 0,4
+
+[Arg::reno-vs-reno]
+vs = reno-vs-reno
+cc_algos = reno,reno
+
+[Arg::reno-vs-reno-sce]
+vs = reno-vs-reno-sce
+cc_algos = reno,reno-sce
+
+[Arg::reno-vs-dctcp]
+vs = reno-vs-dctcp
+cc_algos = reno,dctcp
+
+[Arg::reno-vs-dctcp-sce]
+vs = reno-vs-dctcp-sce
+cc_algos = reno,dctcp-sce
+
+[Arg::reno-sce-vs-reno-sce]
+vs = reno-sce-vs-reno-sce
+cc_algos = reno-sce,reno-sce
+
+[Arg::reno-sce-vs-reno-sce_gamed]
+vs = reno-sce-vs-reno-sce_gamed
+cc_algos = reno,reno-sce
+markings = 0,4
+
+[Arg::reno-sce-vs-dctcp]
+vs = reno-sce-vs-dctcp
+cc_algos = reno-sce,dctcp
+
+[Arg::reno-sce-vs-dctcp-sce]
+vs = reno-sce-vs-dctcp-sce
+cc_algos = reno-sce,dctcp-sce
+
+[Arg::dctcp-vs-dctcp]
+vs = dctcp-vs-dctcp
+cc_algos = dctcp,dctcp
+
+[Arg::dctcp-vs-dctcp-sce]
+vs = dctcp-vs-dctcp-sce
+cc_algos = dctcp,dctcp-sce
+
+[Arg::dctcp-sce-vs-dctcp-sce]
+vs = dctcp-sce-vs-dctcp-sce
+cc_algos = dctcp-sce,dctcp-sce
+
+# Bandwidth-Delay args (generated by bandwidth_delay utility)
+
+[Arg::0.5Mbit_0ms]
+bandwidth = 0.5Mbit
+rtt_delay = 0ms
+cake_rtt = 1ms
+netem_args = delay 0ms limit 1000000
+length = 30
+
+[Arg::0.5Mbit_1ms]
+bandwidth = 0.5Mbit
+rtt_delay = 1ms
+cake_rtt = 1ms
+netem_args = delay 0.5ms limit 1000000
+length = 30
+
+[Arg::0.5Mbit_2ms]
+bandwidth = 0.5Mbit
+rtt_delay = 2ms
+cake_rtt = 2ms
+netem_args = delay 1ms limit 1000000
+length = 30
+
+[Arg::0.5Mbit_5ms]
+bandwidth = 0.5Mbit
+rtt_delay = 5ms
+cake_rtt = 5ms
+netem_args = delay 2.5ms limit 1000000
+length = 30
+
+[Arg::0.5Mbit_10ms]
+bandwidth = 0.5Mbit
+rtt_delay = 10ms
+cake_rtt = 10ms
+netem_args = delay 5ms limit 1000000
+length = 30
+
+[Arg::0.5Mbit_20ms]
+bandwidth = 0.5Mbit
+rtt_delay = 20ms
+cake_rtt = 100ms
+netem_args = delay 10ms limit 1000000
+length = 30
+
+[Arg::0.5Mbit_40ms]
+bandwidth = 0.5Mbit
+rtt_delay = 40ms
+cake_rtt = 100ms
+netem_args = delay 20ms limit 1000000
+length = 30
+
+[Arg::0.5Mbit_80ms]
+bandwidth = 0.5Mbit
+rtt_delay = 80ms
+cake_rtt = 100ms
+netem_args = delay 40ms limit 1000000
+length = 30
+
+[Arg::0.5Mbit_160ms]
+bandwidth = 0.5Mbit
+rtt_delay = 160ms
+cake_rtt = 100ms
+netem_args = delay 80ms limit 1000000
+length = 60
+
+[Arg::1Mbit_0ms]
+bandwidth = 1Mbit
+rtt_delay = 0ms
+cake_rtt = 1ms
+netem_args = delay 0ms limit 1000000
+length = 30
+
+[Arg::1Mbit_1ms]
+bandwidth = 1Mbit
+rtt_delay = 1ms
+cake_rtt = 1ms
+netem_args = delay 0.5ms limit 1000000
+length = 30
+
+[Arg::1Mbit_2ms]
+bandwidth = 1Mbit
+rtt_delay = 2ms
+cake_rtt = 2ms
+netem_args = delay 1ms limit 1000000
+length = 30
+
+[Arg::1Mbit_5ms]
+bandwidth = 1Mbit
+rtt_delay = 5ms
+cake_rtt = 5ms
+netem_args = delay 2.5ms limit 1000000
+length = 30
+
+[Arg::1Mbit_10ms]
+bandwidth = 1Mbit
+rtt_delay = 10ms
+cake_rtt = 10ms
+netem_args = delay 5ms limit 1000000
+length = 30
+
+[Arg::1Mbit_20ms]
+bandwidth = 1Mbit
+rtt_delay = 20ms
+cake_rtt = 100ms
+netem_args = delay 10ms limit 1000000
+length = 30
+
+[Arg::1Mbit_40ms]
+bandwidth = 1Mbit
+rtt_delay = 40ms
+cake_rtt = 100ms
+netem_args = delay 20ms limit 1000000
+length = 30
+
+[Arg::1Mbit_80ms]
+bandwidth = 1Mbit
+rtt_delay = 80ms
+cake_rtt = 100ms
+netem_args = delay 40ms limit 1000000
+length = 30
+
+[Arg::1Mbit_160ms]
+bandwidth = 1Mbit
+rtt_delay = 160ms
+cake_rtt = 100ms
+netem_args = delay 80ms limit 1000000
+length = 60
+
+[Arg::2Mbit_0ms]
+bandwidth = 2Mbit
+rtt_delay = 0ms
+cake_rtt = 1ms
+netem_args = delay 0ms limit 1000000
+length = 30
+
+[Arg::2Mbit_1ms]
+bandwidth = 2Mbit
+rtt_delay = 1ms
+cake_rtt = 1ms
+netem_args = delay 0.5ms limit 1000000
+length = 30
+
+[Arg::2Mbit_2ms]
+bandwidth = 2Mbit
+rtt_delay = 2ms
+cake_rtt = 2ms
+netem_args = delay 1ms limit 1000000
+length = 30
+
+[Arg::2Mbit_5ms]
+bandwidth = 2Mbit
+rtt_delay = 5ms
+cake_rtt = 5ms
+netem_args = delay 2.5ms limit 1000000
+length = 30
+
+[Arg::2Mbit_10ms]
+bandwidth = 2Mbit
+rtt_delay = 10ms
+cake_rtt = 10ms
+netem_args = delay 5ms limit 1000000
+length = 30
+
+[Arg::2Mbit_20ms]
+bandwidth = 2Mbit
+rtt_delay = 20ms
+cake_rtt = 100ms
+netem_args = delay 10ms limit 1000000
+length = 30
+
+[Arg::2Mbit_40ms]
+bandwidth = 2Mbit
+rtt_delay = 40ms
+cake_rtt = 100ms
+netem_args = delay 20ms limit 1000000
+length = 30
+
+[Arg::2Mbit_80ms]
+bandwidth = 2Mbit
+rtt_delay = 80ms
+cake_rtt = 100ms
+netem_args = delay 40ms limit 1000000
+length = 30
+
+[Arg::2Mbit_160ms]
+bandwidth = 2Mbit
+rtt_delay = 160ms
+cake_rtt = 100ms
+netem_args = delay 80ms limit 1000000
+length = 60
+
+[Arg::5Mbit_0ms]
+bandwidth = 5Mbit
+rtt_delay = 0ms
+cake_rtt = 1ms
+netem_args = delay 0ms limit 1000000
+length = 30
+
+[Arg::5Mbit_1ms]
+bandwidth = 5Mbit
+rtt_delay = 1ms
+cake_rtt = 1ms
+netem_args = delay 0.5ms limit 1000000
+length = 30
+
+[Arg::5Mbit_2ms]
+bandwidth = 5Mbit
+rtt_delay = 2ms
+cake_rtt = 2ms
+netem_args = delay 1ms limit 1000000
+length = 30
+
+[Arg::5Mbit_5ms]
+bandwidth = 5Mbit
+rtt_delay = 5ms
+cake_rtt = 5ms
+netem_args = delay 2.5ms limit 1000000
+length = 30
+
+[Arg::5Mbit_10ms]
+bandwidth = 5Mbit
+rtt_delay = 10ms
+cake_rtt = 10ms
+netem_args = delay 5ms limit 1000000
+length = 30
+
+[Arg::5Mbit_20ms]
+bandwidth = 5Mbit
+rtt_delay = 20ms
+cake_rtt = 100ms
+netem_args = delay 10ms limit 1000000
+length = 30
+
+[Arg::5Mbit_40ms]
+bandwidth = 5Mbit
+rtt_delay = 40ms
+cake_rtt = 100ms
+netem_args = delay 20ms limit 1000000
+length = 40
+
+[Arg::5Mbit_80ms]
+bandwidth = 5Mbit
+rtt_delay = 80ms
+cake_rtt = 100ms
+netem_args = delay 40ms limit 1000000
+length = 60
+
+[Arg::5Mbit_160ms]
+bandwidth = 5Mbit
+rtt_delay = 160ms
+cake_rtt = 100ms
+netem_args = delay 80ms limit 1000000
+length = 60
+
+[Arg::10Mbit_0ms]
+bandwidth = 10Mbit
+rtt_delay = 0ms
+cake_rtt = 1ms
+netem_args = delay 0ms limit 1000000
+length = 30
+
+[Arg::10Mbit_1ms]
+bandwidth = 10Mbit
+rtt_delay = 1ms
+cake_rtt = 1ms
+netem_args = delay 0.5ms limit 1000000
+length = 30
+
+[Arg::10Mbit_2ms]
+bandwidth = 10Mbit
+rtt_delay = 2ms
+cake_rtt = 2ms
+netem_args = delay 1ms limit 1000000
+length = 30
+
+[Arg::10Mbit_5ms]
+bandwidth = 10Mbit
+rtt_delay = 5ms
+cake_rtt = 5ms
+netem_args = delay 2.5ms limit 1000000
+length = 30
+
+[Arg::10Mbit_10ms]
+bandwidth = 10Mbit
+rtt_delay = 10ms
+cake_rtt = 10ms
+netem_args = delay 5ms limit 1000000
+length = 30
+
+[Arg::10Mbit_20ms]
+bandwidth = 10Mbit
+rtt_delay = 20ms
+cake_rtt = 100ms
+netem_args = delay 10ms limit 1000000
+length = 30
+
+[Arg::10Mbit_40ms]
+bandwidth = 10Mbit
+rtt_delay = 40ms
+cake_rtt = 100ms
+netem_args = delay 20ms limit 1000000
+length = 40
+
+[Arg::10Mbit_80ms]
+bandwidth = 10Mbit
+rtt_delay = 80ms
+cake_rtt = 100ms
+netem_args = delay 40ms limit 1000000
+length = 60
+
+[Arg::10Mbit_160ms]
+bandwidth = 10Mbit
+rtt_delay = 160ms
+cake_rtt = 100ms
+netem_args = delay 80ms limit 1000000
+length = 60
+
+[Arg::25Mbit_0ms]
+bandwidth = 25Mbit
+rtt_delay = 0ms
+cake_rtt = 1ms
+netem_args = delay 0ms limit 1000000
+length = 30
+
+[Arg::25Mbit_1ms]
+bandwidth = 25Mbit
+rtt_delay = 1ms
+cake_rtt = 1ms
+netem_args = delay 0.5ms limit 1000000
+length = 30
+
+[Arg::25Mbit_2ms]
+bandwidth = 25Mbit
+rtt_delay = 2ms
+cake_rtt = 2ms
+netem_args = delay 1ms limit 1000000
+length = 30
+
+[Arg::25Mbit_5ms]
+bandwidth = 25Mbit
+rtt_delay = 5ms
+cake_rtt = 5ms
+netem_args = delay 2.5ms limit 1000000
+length = 30
+
+[Arg::25Mbit_10ms]
+bandwidth = 25Mbit
+rtt_delay = 10ms
+cake_rtt = 10ms
+netem_args = delay 5ms limit 1000000
+length = 30
+
+[Arg::25Mbit_20ms]
+bandwidth = 25Mbit
+rtt_delay = 20ms
+cake_rtt = 100ms
+netem_args = delay 10ms limit 1000000
+length = 30
+
+[Arg::25Mbit_40ms]
+bandwidth = 25Mbit
+rtt_delay = 40ms
+cake_rtt = 100ms
+netem_args = delay 20ms limit 1000000
+length = 40
+
+[Arg::25Mbit_80ms]
+bandwidth = 25Mbit
+rtt_delay = 80ms
+cake_rtt = 100ms
+netem_args = delay 40ms limit 1000000
+length = 60
+
+[Arg::25Mbit_160ms]
+bandwidth = 25Mbit
+rtt_delay = 160ms
+cake_rtt = 100ms
+netem_args = delay 80ms limit 1000000
+length = 90
+
+[Arg::50Mbit_0ms]
+bandwidth = 50Mbit
+rtt_delay = 0ms
+cake_rtt = 1ms
+netem_args = delay 0ms limit 1000000
+length = 40
+#length = 4
+
+[Arg::50Mbit_1ms]
+bandwidth = 50Mbit
+rtt_delay = 1ms
+cake_rtt = 1ms
+netem_args = delay 0.5ms limit 1000000
+length = 30
+
+[Arg::50Mbit_2ms]
+bandwidth = 50Mbit
+rtt_delay = 2ms
+cake_rtt = 2ms
+netem_args = delay 1ms limit 1000000
+length = 30
+
+[Arg::50Mbit_5ms]
+bandwidth = 50Mbit
+rtt_delay = 5ms
+cake_rtt = 5ms
+netem_args = delay 2.5ms limit 1000000
+length = 30
+
+[Arg::50Mbit_10ms]
+bandwidth = 50Mbit
+rtt_delay = 10ms
+cake_rtt = 10ms
+netem_args = delay 5ms limit 1000000
+length = 40
+
+[Arg::50Mbit_20ms]
+bandwidth = 50Mbit
+rtt_delay = 20ms
+cake_rtt = 100ms
+netem_args = delay 10ms limit 1000000
+length = 30
+
+[Arg::50Mbit_40ms]
+bandwidth = 50Mbit
+rtt_delay = 40ms
+cake_rtt = 100ms
+netem_args = delay 20ms limit 1000000
+length = 60
+
+[Arg::50Mbit_80ms]
+bandwidth = 50Mbit
+rtt_delay = 80ms
+cake_rtt = 100ms
+netem_args = delay 40ms limit 1000000
+length = 60
+
+[Arg::50Mbit_160ms]
+bandwidth = 50Mbit
+rtt_delay = 160ms
+cake_rtt = 100ms
+netem_args = delay 80ms limit 1000000
+length = 180
+
+[Arg::100Mbit_0ms]
+bandwidth = 100Mbit
+rtt_delay = 0ms
+cake_rtt = 1ms
+netem_args = delay 0ms limit 1000000
+length = 30
+
+[Arg::100Mbit_1ms]
+bandwidth = 100Mbit
+rtt_delay = 1ms
+cake_rtt = 1ms
+netem_args = delay 0.5ms limit 1000000
+length = 30
+
+[Arg::100Mbit_2ms]
+bandwidth = 100Mbit
+rtt_delay = 2ms
+cake_rtt = 2ms
+netem_args = delay 1ms limit 1000000
+length = 30
+
+[Arg::100Mbit_5ms]
+bandwidth = 100Mbit
+rtt_delay = 5ms
+cake_rtt = 5ms
+netem_args = delay 2.5ms limit 1000000
+length = 30
+
+[Arg::100Mbit_10ms]
+bandwidth = 100Mbit
+rtt_delay = 10ms
+cake_rtt = 10ms
+netem_args = delay 5ms limit 1000000
+length = 30
+
+[Arg::100Mbit_20ms]
+bandwidth = 100Mbit
+rtt_delay = 20ms
+cake_rtt = 100ms
+netem_args = delay 10ms limit 1000000
+length = 60
+
+[Arg::100Mbit_40ms]
+bandwidth = 100Mbit
+rtt_delay = 40ms
+cake_rtt = 100ms
+netem_args = delay 20ms limit 1000000
+length = 60
+
+[Arg::100Mbit_80ms]
+bandwidth = 100Mbit
+rtt_delay = 80ms
+cake_rtt = 100ms
+netem_args = delay 40ms limit 1000000
+length = 120
+
+[Arg::100Mbit_160ms]
+bandwidth = 100Mbit
+rtt_delay = 160ms
+cake_rtt = 100ms
+netem_args = delay 80ms limit 1000000
+length = 300
