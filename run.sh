@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -f ./private/pushover.sh]; then
+if [ -f "./private/pushover.sh" ]; then
 	. ./private/pushover.sh
 else
 	pushover_user=""
