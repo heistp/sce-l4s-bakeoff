@@ -65,6 +65,7 @@ batch_title = bakeoff
 output_path = ${batch_title}-${batch_time}/${batch_name}
 socket_stats = yes
 length = 60
+step_size = 0.1
 commands = clear, setup, teardown, process
 repetitions = 1
 pause = 5
@@ -169,12 +170,12 @@ inherits = one-flow-l4s, l4s-s1
 [Batch::l4s-s1-2]
 inherits = two-flow-l4s, l4s-s1
 
-# SCE 1: Sender → SCE middlebox (bottleneck) → SCE Receiver
+# SCE 1: Sender → SCE middlebox 1q (bottleneck) → SCE Receiver
 [Batch::sce-s1]
 abstract = yes
 inherits = global
 scenario = 1
-plot_subtitle = Sender → SCE middlebox \(bottleneck\) → SCE Receiver
+plot_subtitle = Sender → SCE middlebox 1q \(bottleneck\) → SCE Receiver
 queueing = cake(${bandwidth} 1q)
 setup_args = ${endpoint_setup} \
 	${m2_ssh} \
