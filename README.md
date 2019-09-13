@@ -16,13 +16,14 @@ This repo contains lab tests using [Flent](https://flent.org/) to compare
    4. [Scenario 4](#scenario-4)
    5. [Scenario 5](#scenario-5)
    6. [Scenario 6](#scenario-6)
-5. [L4S CoDel Interaction](#l4s-codel-interaction)
-6. [Installation](#installation)
+5. [List of SCE Issues](#list-of-sce-issues)
+6. [List of L4S Issues](#list-of-l4s-issues)
+7. [Installation](#installation)
    1. [Kernels](#kernels)
    2. [Flent](#flent)
    3. [Supporting Files](#supporting-files)
-7. [Future Work](#future-work)
-7. [Acknowledgements](#acknowledgements)
+8. [Future Work](#future-work)
+9. [Acknowledgements](#acknowledgements)
 
 
 ## Introduction
@@ -44,7 +45,7 @@ We admit that we have quite a ways to go to thoroughly test all of the
 considerations mentioned in the literature. We also acknowledge that real world
 tests in realistic scenarios should be the final arbiter of the utility of
 high-fidelity congestion control and how it may be deployed. To the extent
-that we can, we will try to incorporate any reported concerns obtained from
+that we can, we will try to incorporate any reported problems seen in
 real world testing into something we can repeatably test in the lab.
 
 The plan is to iterate on these tests up until IETF 106 in Singapore, so that
@@ -145,7 +146,7 @@ tests, this has no effect other than to make it a little clearer when viewing
 the tc statistics.
 
 The setup and teardown logs (examples
-[here](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-1/batch-l4s-s1-1-cubic-50Mbit-0ms.setup.log) and [here](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-1/batch-l4s-s1-1-cubic-50Mbit-0ms.teardown.log)),
+[here](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-1/batch-l4s-s1-1-cubic-50Mbit-0ms.setup.log) and [here](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-1/batch-l4s-s1-1-cubic-50Mbit-0ms.teardown.log)),
 accessible from the *Full Results* links, show the configuration and statistics
 of the qdiscs before and after each test is run.
 
@@ -250,7 +251,7 @@ variations:
 - Different CC algorithms as appropriate
 
 Full results obtained at the SCE Data Center in Portland are available
-[here](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/).
+[here](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/).
 
 Following are descriptions of the scenarios, with observations and links
 to some relevant results from Portland:
@@ -266,20 +267,20 @@ SCE: Sender → SCE middlebox 1q (bottleneck) → SCE Receiver
 
 #### Scenario 1 Portland Results
 
-Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s1-1/) |
-[SCE two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s1-2/) |
-[L4S one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-1/) |
-[L4S two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-2/)
+Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s1-1/) |
+[SCE two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s1-2/) |
+[L4S one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-1/) |
+[L4S two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/)
 
 *One-flow Observations:*
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s1-1/batch-sce-s1-1-cubic-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-1/batch-l4s-s1-1-cubic-50Mbit-10ms_fixed.png), single Cubic flows at 10ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s1-1/batch-sce-s1-1-cubic-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-1/batch-l4s-s1-1-cubic-50Mbit-10ms_fixed.png), single Cubic flows at 10ms
 
   Cake maintains a lower ICMP and TCP RTT than dualpi2, likely due to the
   operation of Cake's COBALT (CoDel-like) AQM in comparison to PI. Note that
   Cake's default target is 5ms, and dualpi2's is 15ms.
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s1-1/batch-sce-s1-1-reno-sce-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-1/batch-l4s-s1-1-prague-50Mbit-10ms_fixed.png), single Reno-SCE and Prague flows at 10ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s1-1/batch-sce-s1-1-reno-sce-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-1/batch-l4s-s1-1-prague-50Mbit-10ms_fixed.png), single Reno-SCE and Prague flows at 10ms
 
   TCP Prague, which uses dualpi2's L queue, maintains a lower ICMP and TCP RTT
   than Reno-SCE. This is probably due to dualpi2 marking congestion at a lower
@@ -288,22 +289,26 @@ Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/ba
   drop in utilization with bursty flows, but this will be tested at a later
   time.
 
-  We see intermittent utilization issue with TCP Prague on this test.
-  Sometimes, it under-utilizes the available bandwidth, and there may be
-  steps up in throughput towards what's expected.
+  [:exclamation:](#l4s-under-utilization) For L4S, we see intermittent
+  under-utilization on this test.
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s1-1/batch-sce-s1-1-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-1/batch-l4s-s1-1-prague-50Mbit-80ms_fixed.png), single Reno-SCE and Prague flows at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s1-1/batch-sce-s1-1-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-1/batch-l4s-s1-1-prague-50Mbit-80ms_fixed.png), single Reno-SCE and Prague flows at 80ms
 
-  Reno-SCE shows a faster ramp during slow start, because while NewReno growth
-  is 1/cwnd segments per ack, Reno-SCE grows by 1/cwnd segments per acked
+  For SCE, Reno-SCE shows a faster ramp during slow start, because while NewReno
+  growth is 1/cwnd segments per ack, Reno-SCE grows by 1/cwnd segments per acked
   segment, so about twice as fast as stock NewReno, but still adhering to the
-  definition of Reno-linear growth.
+  definition of Reno-linear growth. Also, sometimes a single Reno-SCE flow can
+  receive a CE mark, even when already in CA on an otherwise unloaded link. This
+  may be due to a transient load in the test environment, causing a temporary
+  buildup of queue. CE *can* still occur for SCE flows and this is not
+  necessarily abnormal.
 
-  TCP Prague is not fully utilizing the link in this case.
+  [:exclamation:](#l4s-under-utilization) For L4S, as with 10ms, we see
+  intermittent under-utilization on this test.
 
 *Two-flow Observations:*
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s1-2/batch-sce-s1-2-cubic-vs-cubic-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-2/batch-l4s-s1-2-cubic-vs-cubic-50Mbit-80ms_fixed.png), Cubic vs Cubic at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s1-2/batch-sce-s1-2-cubic-vs-cubic-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/batch-l4s-s1-2-cubic-vs-cubic-50Mbit-80ms_fixed.png), Cubic vs Cubic at 80ms
 
   Cubic ramps up faster for dualpi2 than Cake, but with a corresponding spike in
   TCP RTT. We hypothesize that Cubic is exiting HyStart early for Cake here,
@@ -312,33 +317,30 @@ Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/ba
   We can also see that although TCP RTT is higher for dualpi2 than Cake, the L4S
   ping, marked ECT(1), shows lower RTT as the only L queue occupant.
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s1-2/batch-sce-s1-2-cubic-vs-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-2/batch-l4s-s1-2-cubic-vs-prague-50Mbit-80ms_fixed.png), Cubic vs Reno-SCE and Cubic vs Prague at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s1-2/batch-sce-s1-2-cubic-vs-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/batch-l4s-s1-2-cubic-vs-prague-50Mbit-80ms_fixed.png), Cubic vs Reno-SCE and Cubic vs Prague at 80ms
 
-  As expected, without changes to the default SCE marking ramp, Reno-SCE is
-  dominated by a Cubic flow in a single queue. While the SCE team continues
-  to explore solutions to this, two possibilities are the modified SCE
-  marking ramp
-  [presented at IETF 105](https://datatracker.ietf.org/meeting/105/materials/slides-105-tsvwg-sessa-61-some-congestion-experienced-00),
-  and the proposed
-  [Lightweight Fair Queueing](https://tools.ietf.org/html/draft-morton-tsvwg-lightweight-fair-queueing-00).
+  [:exclamation:](#sce-single-queue-non-sce-unfairness) Without changes to the
+  default SCE marking ramp, Reno-SCE is dominated by a Cubic flow in a single
+  queue.
 
-  Unexpectedly, Prague loses to Cubic in single queue competition at 80ms,
-  although its TCP RTT is decidedly lower. Here we see different behaviors at
-  [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-2/batch-l4s-s1-2-cubic-vs-prague-50Mbit-10ms_fixed.png) and [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-2/batch-l4s-s1-2-cubic-vs-prague-50Mbit-0ms_fixed.png),
-  suggesting that single queue fairness is RTT dependent for TCP Prague.
+  [:exclamation:](#l4s-dualpi2-unfairness) Prague loses to Cubic in dualpi2
+  competition at 80ms, although its TCP RTT is decidedly lower. Here we see
+  different behaviors at
+  [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/batch-l4s-s1-2-cubic-vs-prague-50Mbit-10ms_fixed.png) and [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/batch-l4s-s1-2-cubic-vs-prague-50Mbit-0ms_fixed.png),
+  suggesting that fairness is RTT dependent in this case.
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s1-2/batch-sce-s1-2-reno-sce-vs-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-2/batch-l4s-s1-2-prague-vs-prague-50Mbit-80ms_fixed.png), Reno-SCE vs Reno-SCE and Prague vs Prague at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s1-2/batch-sce-s1-2-reno-sce-vs-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/batch-l4s-s1-2-prague-vs-prague-50Mbit-80ms_fixed.png), Reno-SCE vs Reno-SCE and Prague vs Prague at 80ms
 
   Noting that this is a single queue, Reno-SCE shows throughput fairness,
   with convergence in about 25 seconds at 80ms. Convergence time drops to a
   second or two at
-  [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s1-2/batch-sce-s1-2-reno-sce-vs-reno-sce-50Mbit-10ms_fixed.png).
+  [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s1-2/batch-sce-s1-2-reno-sce-vs-reno-sce-50Mbit-10ms_fixed.png).
 
-  Unexpectedly, we are not seeing throughput fairness for TCP Prague at
-  any of the tested RTTs: 
-  [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-2/batch-l4s-s1-2-prague-vs-prague-50Mbit-0ms_fixed.png),
-  [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-2/batch-l4s-s1-2-prague-vs-prague-50Mbit-10ms_fixed.png), or
-  [80ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s1-2/batch-l4s-s1-2-prague-vs-prague-50Mbit-80ms_fixed.png)
+  [:exclamation:](#l4s-dualpi2-unfairness)  We are not seeing throughput
+  fairness for TCP Prague vs itself at any of the tested RTTs: 
+  [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/batch-l4s-s1-2-prague-vs-prague-50Mbit-0ms_fixed.png),
+  [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/batch-l4s-s1-2-prague-vs-prague-50Mbit-10ms_fixed.png), or
+  [80ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/batch-l4s-s1-2-prague-vs-prague-50Mbit-80ms_fixed.png)
  
 
 ### Scenario 2
@@ -352,19 +354,19 @@ SCE: Sender → FQ-AQM middlebox (bottleneck) → SCE middlebox → SCE receiver
 
 #### Scenario 2 Portland Results
 
-Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s2-1/) |
-[SCE two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s2-2/) |
-[L4S one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s2-1/) |
-[L4S two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s2-2/)
+Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s2-1/) |
+[SCE two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s2-2/) |
+[L4S one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s2-1/) |
+[L4S two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s2-2/)
 
 *One-flow Observations:*
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s2-1/batch-sce-s2-1-cubic-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s2-1/batch-l4s-s2-1-cubic-50Mbit-80ms_fixed.png), single Cubic flow at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s2-1/batch-sce-s2-1-cubic-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s2-1/batch-l4s-s2-1-cubic-50Mbit-80ms_fixed.png), single Cubic flow at 80ms
 
   Since fq_codel is the bottleneck in this scenario, single Cubic flows show
   remarkably similar characteristics for both SCE and L4S.
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s2-1/batch-sce-s2-1-dctcp-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s2-1/batch-l4s-s2-1-dctcp-50Mbit-80ms_fixed.png), single flow DCTCP-SCE or
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s2-1/batch-sce-s2-1-dctcp-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s2-1/batch-l4s-s2-1-dctcp-50Mbit-80ms_fixed.png), single flow DCTCP-SCE or
   DCTCP at 80ms
 
   DCTCP-SCE shows a throughput sawtooth because DCTCP-SCE treats the CE marks
@@ -379,29 +381,28 @@ Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/ba
   to DCTCP-SCE, whose TCP RTT increase only approaches 5ms as queue depths near
   the CE marking point.
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s2-1/batch-sce-s2-1-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s2-1/batch-l4s-s2-1-prague-50Mbit-80ms_fixed.png), single Reno-SCE and Prague flows at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s2-1/batch-sce-s2-1-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s2-1/batch-l4s-s2-1-prague-50Mbit-80ms_fixed.png), single Reno-SCE and Prague flows at 80ms
 
   As expected, Reno-SCE shows a Reno-like throughput sawtooth, because SCE 
   marking is not occurring at the bottleneck.
 
-  Although TCP Prague maintains higher utilization due to its DCTCP-like
-  behavior and L4S style response to CE, there is a remarkable TCP RTT spike
-  as the flow starts. The full extent of it is better seen in the
-  [same plot with variable scaling](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s2-1/batch-l4s-s2-1-prague-50Mbit-80ms_var.png).
-  This is due to an interaction with CoDel that is further described in
-  [L4S CoDel Interaction](#l4s-codel-interaction). In this case, the spike
-  occurs for TCP RTT and not ICMP RTT because fq_codel's fair queueing and
-  sparse flow optimization are keeping queue sojourn times low for the sparse
-  ICMP flow.
+  [:exclamation:](#l4s-codel-interaction) Although TCP Prague maintains
+  higher utilization due to its DCTCP-like behavior and L4S style response
+  to CE, there is a remarkable TCP RTT spike as the flow starts due to its
+  interaction with CoDel. The full extent of it is better seen in the
+  [same plot with variable scaling](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s2-1/batch-l4s-s2-1-prague-50Mbit-80ms_var.png).
+  In this case, the spike occurs for TCP RTT and not ICMP RTT because
+  fq_codel's fair queueing and sparse flow optimization are keeping queue
+  sojourn times low for the sparse ICMP flow.
 
 *Two-flow Observations:*
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s2-2/batch-sce-s2-2-cubic-vs-reno-sce-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s2-2/batch-l4s-s2-2-cubic-vs-prague-50Mbit-10ms_fixed.png), Cubic vs Reno-SCE and Cubic vs Prague at 10ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s2-2/batch-sce-s2-2-cubic-vs-reno-sce-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s2-2/batch-l4s-s2-2-cubic-vs-prague-50Mbit-10ms_fixed.png), Cubic vs Reno-SCE and Cubic vs Prague at 10ms
 
-  Consistent with earlier results, as the second flow is introduced
-  (Reno-SCE for SCE and Prague for L4S), the TCP RTT spike described
-  earlier (due to the [L4S CoDel Interaction](#l4s-codel-interaction))
-  only occurs for TCP Prague.
+  [:exclamation:](#l4s-codel-interaction) Consistent with earlier results,
+  as the second flow is introduced (Reno-SCE for SCE and Prague for L4S),
+  the TCP RTT spike due to the interaction with CoDel only occurs for
+  TCP Prague.
 
 ### Scenario 3
 
@@ -415,35 +416,36 @@ SCE: Sender → single-AQM middlebox (bottleneck) → SCE middlebox → SCE rece
 
 #### Scenario 3 Portland Results
 
-Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s3-1/) |
-[SCE two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s3-2/) |
-[L4S one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s3-1/) |
-[L4S two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s3-2/)
+Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s3-1/) |
+[SCE two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s3-2/) |
+[L4S one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s3-1/) |
+[L4S two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s3-2/)
 
 *One-flow Observations:*
 
-- [SCE FQ](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s2-1/batch-sce-s2-1-reno-sce-50Mbit-80ms_fixed.png) vs [SCE 1Q](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s3-1/batch-sce-s3-1-reno-sce-50Mbit-80ms_fixed.png) and
-[L4S FQ](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s2-1/batch-l4s-s2-1-prague-50Mbit-80ms_fixed.png) vs [L4S 1Q](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s3-1/batch-l4s-s3-1-prague-50Mbit-80ms_fixed.png), single Reno-SCE or Prague flow at 80ms
+- [SCE FQ](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s2-1/batch-sce-s2-1-reno-sce-50Mbit-80ms_fixed.png) vs [SCE 1Q](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s3-1/batch-sce-s3-1-reno-sce-50Mbit-80ms_fixed.png) and
+[L4S FQ](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s2-1/batch-l4s-s2-1-prague-50Mbit-80ms_fixed.png) vs [L4S 1Q](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s3-1/batch-l4s-s3-1-prague-50Mbit-80ms_fixed.png), single Reno-SCE or Prague flow at 80ms
 
   As expected, for SCE, moving to a single queue makes the short spike in
   RTT equivalent for ICMP and TCP, as there is no longer fair queueing or
   sparse flow optimization.
 
-  For L4S, the single queue means that the
-  [L4S CoDel Interaction](#l4s-codel-interaction) affects all other flows
-  sharing the same queue.
+  [:exclamation:](#l4s-codel-interaction)For L4S, the single queue means that the
+  interaction with CoDel affects all other flows sharing the same queue.
 
 *Two-flow Observations:*
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s3-2/batch-sce-s3-2-cubic-vs-reno-sce-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s3-2/batch-l4s-s3-2-cubic-vs-prague-50Mbit-10ms_fixed.png), Cubic vs Reno-SCE and Cubic vs Prague at 10ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s3-2/batch-sce-s3-2-cubic-vs-reno-sce-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s3-2/batch-l4s-s3-2-cubic-vs-prague-50Mbit-10ms_fixed.png), Cubic vs Reno-SCE and Cubic vs Prague at 10ms
 
   For SCE, Reno-SCE's mean throughput is about 1.5x that of Cubic, due to the
   use of the ABE response to CE described in
-  [RFC 8511](https://tools.ietf.org/html/rfc8511).
+  [RFC 8511](https://tools.ietf.org/html/rfc8511). Whether or not this is
+  acceptable is a discussion that should happen as part of the ABE
+  standardization process.
 
-  For L4S, TCP Prague's mean throughput is about 4x that of Cubic, due to the
-  redefinition of CE and its assumption that the CE mark is coming from an
-  L4S aware AQM.
+  [:exclamation:](#l4s-ce-unfairness) For L4S, TCP Prague's mean throughput
+  is about 4x that of Cubic, due to the redefinition of CE and its assumption
+  that the CE mark is coming from an L4S aware AQM.
 
   The potential for unfairness was hinted at in
   [RFC 3168 Section 5](https://tools.ietf.org/html/rfc3168#section-5), where
@@ -453,15 +455,18 @@ Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/ba
   > than to a packet drop, this could result in unfair treatment for
   > different flows.
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s3-2/batch-sce-s3-2-reno-sce-vs-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s3-2/batch-l4s-s3-2-prague-vs-prague-50Mbit-80ms_fixed.png), Reno-SCE vs Reno-SCE and Prague vs Prague at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s3-2/batch-sce-s3-2-reno-sce-vs-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s3-2/batch-l4s-s3-2-prague-vs-prague-50Mbit-80ms_fixed.png), Reno-SCE vs Reno-SCE and Prague vs Prague at 80ms
 
   Reno-SCE vs Reno-SCE shows approximate throughput fairness in a single
-  queue at an RTT delay of 80ms, as well as [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s3-2/batch-sce-s3-2-reno-sce-vs-reno-sce-50Mbit-0ms_fixed.png) and [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s3-2/batch-sce-s3-2-reno-sce-vs-reno-sce-50Mbit-10ms_fixed.png).
+  queue at an RTT delay of 80ms, as well as [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s3-2/batch-sce-s3-2-reno-sce-vs-reno-sce-50Mbit-0ms_fixed.png) and [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s3-2/batch-sce-s3-2-reno-sce-vs-reno-sce-50Mbit-10ms_fixed.png).
 
-  TCP Prague vs TCP Prague shows unfairness in favor of the first flow to
-  start. This also occurs at [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s3-2/batch-l4s-s3-2-prague-vs-prague-50Mbit-0ms_fixed.png) and [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s3-2/batch-l4s-s3-2-prague-vs-prague-50Mbit-10ms_fixed.png),
+  [:exclamation:](#l4s-ce-unfairness) TCP Prague vs TCP Prague shows
+  unfairness in favor of the first flow to start. This also occurs at
+  [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s3-2/batch-l4s-s3-2-prague-vs-prague-50Mbit-0ms_fixed.png) and
+  [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s3-2/batch-l4s-s3-2-prague-vs-prague-50Mbit-10ms_fixed.png),
   however, we have noted in several runs that the unfairness does not
-  always favor the first flow.
+  always favor the first flow. We're not sure of the cause of this, so have
+  classified it under a possible result of CE unfairness.
 
 ### Scenario 4
 
@@ -479,23 +484,23 @@ and may also be inferred from their behavior.
 
 #### Scenario 4 Portland Results
 
-Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s4-1/) |
-[SCE two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s4-2/) |
-[L4S one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s4-1/) |
-[L4S two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s4-2/)
+Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s4-1/) |
+[SCE two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s4-2/) |
+[L4S one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s4-1/) |
+[L4S two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s4-2/)
 
 *One-flow Observations:*
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s4-1/batch-sce-s4-1-cubic-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s4-1/batch-l4s-s4-1-cubic-50Mbit-80ms_fixed.png), single Cubic flow at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s4-1/batch-sce-s4-1-cubic-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s4-1/batch-l4s-s4-1-cubic-50Mbit-80ms_fixed.png), single Cubic flow at 80ms
 
   For SCE, Cubic is unaffected by setting ECT(1) on all packets.
 
   For L4S, setting ECT(1) on all packets places them in the L queue,
   causing a drop in utilization that increases as the RTT delay goes up
   (compare with
-  [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s4-1/batch-l4s-s4-1-cubic-50Mbit-10ms_fixed.png) and [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s4-1/batch-l4s-s4-1-cubic-50Mbit-0ms_fixed.png)).
+  [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s4-1/batch-l4s-s4-1-cubic-50Mbit-10ms_fixed.png) and [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s4-1/batch-l4s-s4-1-cubic-50Mbit-0ms_fixed.png)).
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s4-1/batch-sce-s4-1-dctcp-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s4-1/batch-l4s-s4-1-dctcp-50Mbit-80ms_fixed.png), single DCTCP-SCE or DCTCP flow at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s4-1/batch-sce-s4-1-dctcp-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s4-1/batch-l4s-s4-1-dctcp-50Mbit-80ms_fixed.png), single DCTCP-SCE or DCTCP flow at 80ms
 
   As expected, setting ECT(1) on all packets causes a collapse in throughput
   for DCTCP-SCE, as there is a cwnd reduction for each ACK, limited to a
@@ -505,21 +510,23 @@ Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/ba
   For L4S, setting ECT(1) on all packets causes a drop in utilization for
   DCTCP that's RTT dependent, similar to Cubic.
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s4-1/batch-sce-s4-1-reno-sce-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s4-1/batch-l4s-s4-1-prague-50Mbit-10ms_fixed.png), single Reno-SCE or Prague flow at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s4-1/batch-sce-s4-1-reno-sce-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s4-1/batch-l4s-s4-1-prague-50Mbit-10ms_fixed.png), single Reno-SCE or Prague flow at 80ms
 
   We see the similar throughput collapse for SCE.
 
-  L4S is unaffected because TCP Prague marks ECT(1) anyway.
+  L4S is unaffected because TCP Prague marks ECT(1) anyway, however, the
+  under-utilization problem with dualpi2 is also sometimes seen here.
 
 *Two-flow Observations:*
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s4-2/batch-sce-s4-2-cubic-vs-cubic_gamed-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s4-2/batch-l4s-s4-2-cubic-vs-cubic_gamed-50Mbit-80ms_fixed.png), Cubic vs Cubic "Gamed" at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s4-2/batch-sce-s4-2-cubic-vs-cubic_gamed-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s4-2/batch-l4s-s4-2-cubic-vs-cubic_gamed-50Mbit-80ms_fixed.png), Cubic vs Cubic "Gamed" at 80ms
 
   For SCE, Cubic is unaffected by the setting of ECT(1), so the result is
   the same as if there were no gaming.
 
   For L4S, the gamed flow sees a reduction in utilization that causes it to have
-  lower throughput than the un-gamed flow.
+  lower throughput than the un-gamed flow, which should discourage gaming
+  in this way.
 
 ### Scenario 5
 
@@ -535,52 +542,55 @@ SCE: Sender → SCE middlebox (bottleneck 1) → FIFO middlebox (bottleneck 2) �
 
 #### Scenario 5 Portland Results
 
-Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s5-1/) |
-[SCE two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s5-2/) |
-[L4S one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s5-1/) |
-[L4S two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s5-2/)
+Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s5-1/) |
+[SCE two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s5-2/) |
+[L4S one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s5-1/) |
+[L4S two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s5-2/)
 
 *One-flow Observations:*
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s5-1/batch-sce-s5-1-cubic-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s5-1/batch-l4s-s5-1-cubic-50Mbit-80ms_fixed.png), single Cubic flow at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s5-1/batch-sce-s5-1-cubic-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s5-1/batch-l4s-s5-1-cubic-50Mbit-80ms_fixed.png), single Cubic flow at 80ms
 
   Both SCE and L4S see very similar latency spikes at flow startup, as the
   initial bottleneck (bottleneck 3) is the same.
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s5-1/batch-sce-s5-1-reno-sce-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s5-1/batch-l4s-s5-1-prague-50Mbit-10ms_fixed.png), single Reno-SCE or Prague flow at 10ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s5-1/batch-sce-s5-1-reno-sce-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s5-1/batch-l4s-s5-1-prague-50Mbit-10ms_fixed.png), single Reno-SCE or Prague flow at 10ms
 
   For SCE, we see a similar latency spike at flow startup as with Cubic.
 
-  For L4S, but we also see a longer and higher spike in TCP RTT due to the
-  [L4S CoDel Interaction](#l4s-codel-interaction), and a spike in ICMP RTT
-  that occurs at the single FIFO queue in bottleneck 2.
+  [:exclamation:](#l4s-codel-interaction) For L4S, but we also see a longer
+  and higher spike in TCP RTT due to the interaction with CoDel, and a
+  resulting spike in ICMP RTT that occurs at the single FIFO queue in
+  bottleneck 2.
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s5-1/batch-sce-s5-1-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s5-1/batch-l4s-s5-1-prague-50Mbit-80ms_fixed.png), single Reno-SCE or Prague flow at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s5-1/batch-sce-s5-1-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s5-1/batch-l4s-s5-1-prague-50Mbit-80ms_fixed.png), single Reno-SCE or Prague flow at 80ms
 
-  While the initial latency spike for SCE is similar to the one at 10ms,
-  the intra-flow and inter-flow spikes for L4S have increased in
-  duration and magnitude (see also Prague plots with variable RTT scale at
-  [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s5-1/batch-l4s-s5-1-prague-50Mbit-10ms_var.png) and [80ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s5-1/batch-l4s-s5-1-prague-50Mbit-80ms_var.png)).
+  The initial latency spike for SCE is similar to the one at 10ms.
+
+  [:exclamation:](#l4s-codel-interaction) The intra-flow and inter-flow
+  spikes for L4S have increased in duration and magnitude in going from 10ms
+  to 80ms (see also the Prague plots with variable RTT scaling at
+  [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s5-1/batch-l4s-s5-1-prague-50Mbit-10ms_var.png) and [80ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s5-1/batch-l4s-s5-1-prague-50Mbit-80ms_var.png)).
 
 *Two-flow Observations:*
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s5-2/batch-sce-s5-2-cubic-vs-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s5-2/batch-l4s-s5-2-cubic-vs-prague-50Mbit-80ms_fixed.png), Cubic vs Reno-SCE or Cubic vs Prague at 80ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s5-2/batch-sce-s5-2-cubic-vs-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s5-2/batch-l4s-s5-2-cubic-vs-prague-50Mbit-80ms_fixed.png), Cubic vs Reno-SCE or Cubic vs Prague at 80ms
 
   For SCE, similar relatively short latency spikes are seen on startup of
   each flow.
 
-  For L4S, the longer latency spike upon startup of the Prague flow (due to
-  the [L4S CoDel Interaction](#l4s-codel-interaction)) affects the Cubic
-  flow and both ping flows as well.
+  [:exclamation:](#l4s-codel-interaction) For L4S, the longer latency spike
+  upon startup of the Prague flow, due to the interaction with CoDel,
+  affects the Cubic flow and both ping flows as well.
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s5-2/batch-sce-s5-2-reno-sce-vs-reno-sce-50Mbit-80ms_var.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s5-2/batch-l4s-s5-2-prague-vs-prague-50Mbit-80ms_var.png), Reno-SCE vs Reno-SCE or Prague vs Prague at 80ms, variable RTT scaling
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s5-2/batch-sce-s5-2-reno-sce-vs-reno-sce-50Mbit-80ms_var.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s5-2/batch-l4s-s5-2-prague-vs-prague-50Mbit-80ms_var.png), Reno-SCE vs Reno-SCE or Prague vs Prague at 80ms, variable RTT scaling
 
   For SCE, the latency bursts on startup of each flow are comparatively short,
   but significant in magnitude.
 
-  For L4S, the longer latency spikes due to the
-  [L4S CoDel Interaction](#l4s-codel-interaction) can be seen. The following
-  commentary from Jonathan Morton describes what each trace represents:
+  [:exclamation:](#l4s-codel-interaction) For L4S, the longer latency spikes
+  due to the interaction with CoDel can be seen. The following commentary
+  from Jonathan Morton describes what each trace represents:
 
   > The *magenta* trace (overlapping completely with the *violet* trace) is the
   > delay incurred at the FIFO.
@@ -615,20 +625,20 @@ SCE: Sender → Delay → FIFO middlebox (bottleneck 1) → FQ-AQM middlebox (bo
 
 #### Scenario 6 Portland Results
 
-Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s6-1/) |
-[SCE two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s6-2/) |
-[L4S one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s6-1/) |
-[L4S two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s6-2/)
+Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s6-1/) |
+[SCE two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s6-2/) |
+[L4S one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s6-1/) |
+[L4S two-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s6-2/)
 
 *One-flow Observations:*
 
-- SCE for [Cubic](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s6-1/batch-sce-s6-1-cubic-50Mbit-80ms_fixed.png) and [Reno-SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s6-1/batch-sce-s6-1-reno-sce-50Mbit-80ms_fixed.png) vs L4S for [Cubic](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s6-1/batch-l4s-s6-1-cubic-50Mbit-80ms_fixed.png) and [Prague](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s6-1/batch-l4s-s6-1-prague-50Mbit-80ms_fixed.png), both at 80ms
+- SCE for [Cubic](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s6-1/batch-sce-s6-1-cubic-50Mbit-80ms_fixed.png) and [Reno-SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s6-1/batch-sce-s6-1-reno-sce-50Mbit-80ms_fixed.png) vs L4S for [Cubic](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s6-1/batch-l4s-s6-1-cubic-50Mbit-80ms_fixed.png) and [Prague](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s6-1/batch-l4s-s6-1-prague-50Mbit-80ms_fixed.png), both at 80ms
 
   As expected, for SCE we see the described relatively short latency spikes
   at flow start.
 
-  For L4S, the TCP Prague spike has a longer duration and higher magnitude due
-  to the previously described [L4S CoDel Interaction](#l4s-codel-interaction).
+  [:exclamation:](#l4s-codel-interaction) For L4S, the TCP Prague spike has a
+  longer duration and higher magnitude due to the interaction with CoDel.
   The FIFO located before fq_codel is what causes the ICMP RTT spike. With a
   single fq_codel bottleneck, ICMP RTT would be kept low during the
   spike in TCP RTT by fair queueing and sparse flow optimization, as we saw
@@ -636,31 +646,73 @@ Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/ba
 
 *Two-flow Observations:*
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s6-2/batch-sce-s6-2-cubic-vs-reno-sce-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s6-2/batch-l4s-s6-2-cubic-vs-prague-50Mbit-10ms_fixed.png), Cubic vs Reno-SCE or Cubic vs Prague at 10ms
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s6-2/batch-sce-s6-2-cubic-vs-reno-sce-50Mbit-10ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s6-2/batch-l4s-s6-2-cubic-vs-prague-50Mbit-10ms_fixed.png), Cubic vs Reno-SCE or Cubic vs Prague at 10ms
 
   For SCE, we see a TCP RTT sawtooth during competition. Because there are
   no SCE-aware middleboxes, Reno-SCE reverts to standard
   [RFC 3168](https://tools.ietf.org/html/rfc3168) behavior.
 
-  For L4S, we see the previously seen latency spikes at flow startup due
-  to the [L4S CoDel Interaction](#l4s-codel-interaction).
+  [:exclamation:](#l4s-codel-interaction) For L4S, we see the previously
+  seen latency spikes at flow startup.
 
-- SCE for Reno-SCE vs Reno-SCE at [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s6-2/batch-sce-s6-2-reno-sce-vs-reno-sce-50Mbit-0ms_fixed.png),
-[10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s6-2/batch-sce-s6-2-reno-sce-vs-reno-sce-50Mbit-10ms_fixed.png)
-and [80ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/sce-s6-2/batch-sce-s6-2-reno-sce-vs-reno-sce-50Mbit-80ms_fixed.png),
-  and L4S for Prague vs Prague at [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s6-2/batch-l4s-s6-2-prague-vs-prague-50Mbit-0ms_var.png),
-  [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s6-2/batch-l4s-s6-2-prague-vs-prague-50Mbit-10ms_var.png) and
-  [80ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T094018-r1/l4s-s6-2/batch-l4s-s6-2-prague-vs-prague-50Mbit-80ms_var.png)
+- SCE for Reno-SCE vs Reno-SCE at [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s6-2/batch-sce-s6-2-reno-sce-vs-reno-sce-50Mbit-0ms_fixed.png),
+[10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s6-2/batch-sce-s6-2-reno-sce-vs-reno-sce-50Mbit-10ms_fixed.png)
+and [80ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s6-2/batch-sce-s6-2-reno-sce-vs-reno-sce-50Mbit-80ms_fixed.png),
+  and L4S for Prague vs Prague at [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s6-2/batch-l4s-s6-2-prague-vs-prague-50Mbit-0ms_var.png),
+  [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s6-2/batch-l4s-s6-2-prague-vs-prague-50Mbit-10ms_var.png) and
+  [80ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s6-2/batch-l4s-s6-2-prague-vs-prague-50Mbit-80ms_var.png)
 
-  As we have seen previously, the latency spikes at flow startup for L4S
-  are longer, due to the [L4S CoDel Interaction](#l4s-codel-interaction), and
-  their magnitude and duration are partly dependent on the path RTT.
+  [:exclamation:](#l4s-codel-interaction) As we have seen previously, the
+  latency spikes at flow startup for L4S are longer, due to the
+  interaction with CoDel, and their magnitude and duration are partly
+  dependent on the path RTT.
 
+## List of SCE Issues
 
-## L4S CoDel Interaction
+### SCE Single Queue Non-SCE Unfairness
+
+Because SCE is marked at lower queue depths than CE, non-SCE flows will
+outcompete SCE flows in a single queue without either changes to the
+SCE marking ramp,
+[presented at IETF 105](https://datatracker.ietf.org/meeting/105/materials/slides-105-tsvwg-sessa-61-some-congestion-experienced-00),
+or the proposed
+[Lightweight Fair Queueing](https://tools.ietf.org/html/draft-morton-tsvwg-lightweight-fair-queueing-00).
+
+Changing the marking ramp is effective, but can require some tuning. The
+use of FQ is also effective, but has caused some controversy because of a
+perception that FQ can do harm to periodic bursty flows. For this reason,
+the SCE team continues to explore alternative solutions to this challenge.
+
+## List of L4S Issues
+
+Note that the list below may contain inaccuracies, as it comes from our
+attempt to combine the behavior in different scenarios into a list of
+issues. Please file an
+[Issue](https://github.com/heistp/sce-l4s-bakeoff/issues) to report any
+corrections.
+
+### L4S Under-Utilization
+
+We sometimes see link under-utilization for either DCTCP or TCP Prague
+when used with dualpi2. This may be accompanied by occasional steps up in
+throughput. See [Scenario 1](#scenario-1). One possible cause for this
+could be Flent's simultaneous ping measurement flow, but the drops in
+utilization we sometimes see (50%, for example) are larger than might
+be expected from that.
+
+### L4S Dualpi2 Unfairness
+
+We do not see fairness between either Cubic vs TCP Prague or TCP Prague vs
+itself when used with dualpi2, and fairness characteristics are RTT
+dependent. If there are dualpi2 parameters that influence this, we could
+add those to the test, but we did expect that fairness between TCP
+Prague and itself would be the default.
+See [Scenario 1](#scenario-1).
+
+### L4S CoDel Interaction
 
 In the [Scenarios and Results](#scenarios-and-results) section above, we saw
-several cases where using TCP Prague with CoDel resulted in TCP RTT and
+a number of cases where using TCP Prague with CoDel resulted in TCP RTT and
 sometimes ICMP RTT spikes. This is due to the fact that the L4S architecture
 redefines CE to be a fine-grained congestion control signal that is expected to
 be marked at shallower queue depths. When it's not, it takes longer for Prague
@@ -672,6 +724,18 @@ the marking rate rises quickly with queue depth for
 [PIE](https://tools.ietf.org/html/rfc8033) and
 [RED](http://www.icir.org/floyd/papers/red/red.html), for example.
 
+### L4S CE Unfairness
+
+When TCP Prague receives CE signals from a non-L4S-aware AQM, as can happen
+in [Scenario 3](#scenario-3), for example, it can result in domination of
+L4S flows over classic flows sharing the same queue. This is due to the 
+redefinition of CE, and the inability of the current implementation to detect
+when the bottleneck is a non-L4S-aware queue.
+
+This issue may also extend to unfairness among L4S (TCP Prague) flows when
+being signaled by non-L4S-aware AQM, such as seen later in
+[Scenario 3](#scenario-3) (as those flows may expect a higher CE signaling
+rate), but we're unsure about that.
 
 ## Installation
 
@@ -873,7 +937,6 @@ Syncs files between C1 and C2, e.g.
 
 This is what we plan to do next:
 
-- Do a full clean run in Portland and retain pcap files
 - Add a scenario with a sudden capacity increase, then decrease
 - Add a scenario with a sudden RTT increase, then decrease
 - Add a scenario with a simulated bursty link using netem slotting
