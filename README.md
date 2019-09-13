@@ -254,7 +254,10 @@ Full results obtained at the SCE Data Center in Portland are available
 [here](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/).
 
 Following are descriptions of the scenarios, with observations and links
-to some relevant results from Portland:
+to some relevant results from Portland. Issues are marked with the icon
+:exclamation:, which is linked to the corresponding issue under the sections
+[List of SCE Issues](#list-of-sce-issues) and [List of L4S
+Issues](#list-of-l4s-issues).
 
 ### Scenario 1
 
