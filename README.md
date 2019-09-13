@@ -758,8 +758,8 @@ replace the existing `.config` file in the kernel tree.
 
 | Kernel | Clone Command                                | Sample Config            |
 | ------ | -------------------------------------------- | ------------------------ |
-| SCE    | `git clone https://github.com/chromi/sce/`   | [config-l4s](config-l4s) | 
-| L4S    | `git clone https://github.com/L4STeam/linux` | [config-sce](config-sce) | 
+| SCE    | `git clone https://github.com/chromi/sce/`   | [config-sce](config-sce) | 
+| L4S    | `git clone https://github.com/L4STeam/linux` | [config-l4s](config-l4s) | 
 
 Refer to or use the included [kbuild.sh](kbuild.sh) file to build the kernel and
 deploy it to the test nodes. While using this file is not required, it can be
