@@ -860,6 +860,16 @@ Clients require jq for some post-processing tasks of the JSON in the
 sudo apt-get install jq
 ```
 
+#### parallel
+
+Clients may optionally install the GNU parallel command, which makes some
+post-processing tasks faster with multiple CPUs, including running bzip2
+on each pcap file.
+
+```
+sudo apt-get install parallel
+```
+
 #### Flent
 
 Clients require Flent.
