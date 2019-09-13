@@ -579,9 +579,8 @@ Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/ba
   but significant in magnitude.
 
   For L4S, the longer latency spikes due to the
-  [L4S CoDel Interaction](#l4s-codel-interaction) are seen on startup of
-  the first flow, and sometimes the second flow. The following commentary
-  from Jonathan Morton further describes what's going on:
+  [L4S CoDel Interaction](#l4s-codel-interaction) can be seen. The following
+  commentary from Jonathan Morton describes what each trace represents:
 
   > The *magenta* trace (overlapping completely with the *violet* trace) is the
   > delay incurred at the FIFO.
@@ -591,6 +590,14 @@ Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/ba
   >
   > The *yellow* trace is the delay incurred in both queues by the second
   > Prague flow (whose throughput is tracked by the *orange* trace).
+
+  :information_source: Note here that when the second Prague flow drops out
+  of slow start early, as commonly happens with the default pacing parameters,
+  the latency spike on startup of the second flow is minimal to nonexistent.
+  However, when `ss_ratio=100` and `ca_ratio=40` are used (as we typically
+  use for SCE), the second flow usually does not drop out of slow start too
+  early, and the second latency spike can be seen, as in
+  [this plot](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T021200-pacing-100/l4s-s5-2/batch-l4s-s5-2-prague-vs-prague-50Mbit-80ms_var.png).
 
 ### Scenario 6
 
