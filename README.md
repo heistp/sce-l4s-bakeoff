@@ -101,14 +101,14 @@ The kernels, software and sysctl settings on each node are as follows:
 - C1 (SCE):
   - role: client / sender
   - kernel: [SCE](https://github.com/chromi/sce/)
-  - software: flent, netperf, fping
+  - software: [flent](https://flent.org/), netperf, fping, tcpdump, [scetrace](https://github.com/heistp/scetrace)
   - sysctl: `net.ipv4.tcp_ecn = 1`
   - sysctl: `net.ipv4.tcp_pacing_ca_ratio = 40`
   - sysctl: `net.ipv4.tcp_pacing_ss_ratio = 100`
 - C2 (L4S):
   - role: client / sender
   - kernel: [L4S](https://github.com/L4STeam/linux)
-  - software: flent, netperf, fping
+  - software: [flent](https://flent.org/), netperf, fping, tcpdump, [scetrace](https://github.com/heistp/scetrace)
   - sysctl: `net.ipv4.tcp_ecn = 3`
 - M1:
   - role: middlebox
@@ -129,12 +129,12 @@ The kernels, software and sysctl settings on each node are as follows:
 - S1 (SCE):
   - role: server / receiver
   - kernel: [SCE](https://github.com/chromi/sce/)
-  - software: netserver
+  - software: netserver, tcpdump
   - sysctl: `net.ipv4.tcp_sce = 1`
 - S2 (L4S):
   - role: server / receiver
   - kernel: [L4S](https://github.com/L4STeam/linux)
-  - software: netserver
+  - software: netserver, tcpdump
   - sysctl: `net.ipv4.tcp_ecn = 3`
 
 ### Qdisc Configuration
