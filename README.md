@@ -539,9 +539,9 @@ Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/ba
 > bottlenecks. This is a test which explores the effects of that scenario, and
 > is relevant to best consumer practice on today's Internet.
 
-L4S: Sender → L4S middlebox (bottleneck 1) → FIFO middlebox (bottleneck 2) → FQ-AQM middlebox (bottleneck 3) → L4S receiver
+L4S: Sender → L4S middlebox (bottleneck #1, 100Mbit) → FIFO middlebox (bottleneck #2, 50Mbit) → FQ-AQM middlebox (bottleneck #3, 47.5Mbit) → L4S receiver
 
-SCE: Sender → SCE middlebox (bottleneck 1) → FIFO middlebox (bottleneck 2) → FQ-AQM middlebox (bottleneck 3) → SCE receiver
+SCE: Sender → SCE middlebox (bottleneck #1, 100Mbit) → FIFO middlebox (bottleneck #2, 50Mbit) → FQ-AQM middlebox (bottleneck #3, 47.5Mbit) → SCE receiver
 
 #### Scenario 5 Portland Results
 
@@ -622,9 +622,9 @@ Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/ba
 > Expected results with L4S in the subject topology, however, are a peak
 > extending about 4 seconds before returning to baseline.
 
-L4S: Sender → Delay → FIFO middlebox (bottleneck 1) → FQ-AQM middlebox (bottleneck 2) → L4S receiver
+L4S: Sender → Delay → FIFO middlebox (bottleneck #1, 52.5Mbit) → FQ-AQM middlebox (bottleneck #2, 50Mbit) → L4S receiver
 
-SCE: Sender → Delay → FIFO middlebox (bottleneck 1) → FQ-AQM middlebox (bottleneck 2) → SCE receiver
+SCE: Sender → Delay → FIFO middlebox (bottleneck #1, 52.5Mbit) → FQ-AQM middlebox (bottleneck #2, 50Mbit) → SCE receiver
 
 #### Scenario 6 Portland Results
 
