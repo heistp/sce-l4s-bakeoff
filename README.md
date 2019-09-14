@@ -151,7 +151,9 @@ accessible from the *Full Results* links, show the configuration and statistics
 of the qdiscs before and after each test is run.
 
 :information_source: All bottlenecks restrict to 50Mbit, unless otherwise
-noted. Bandwidth information is also available in line 3 of the plot title.
+noted. Bandwidth information is also available in line 3 of the plot titles.
+All shaping is done on egress, except for netem delays, which are added on
+ingress. 
 
 ### Pacing Parameters
 
