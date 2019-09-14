@@ -200,7 +200,7 @@ We do not use these settings for L4S, because that's not what the L4S team
 tested with, and we have not found these settings to materially improve the
 results for L4S in repeatable ways. For comparison, the full results for an
 L4S run with the modified pacing are
-[here](bakeoff-2019-09-12T021200-pacing-100). Please file
+[here](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T021200-pacing-100). Please file
 an [Issue](https://github.com/heistp/sce-l4s-bakeoff/issues) if there are
 any concerns with this.
 
