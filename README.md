@@ -200,11 +200,14 @@ for SCE.
 
 We do not use these settings for L4S, because that's not what the L4S team
 tested with, and we have not found these settings to materially improve the
-results for L4S in repeatable ways. For comparison, the full results for an
-L4S run with the modified pacing are
-[here](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T021200-pacing-100). Please file
-an [Issue](https://github.com/heistp/sce-l4s-bakeoff/issues) if there are
-any concerns with this.
+results for L4S in repeatable ways. On the contrary, in the
+[Scenario 5](#scenario-5) two-flow results the default pacing can hide the
+latency spike of the second TCP Prague flow when it exits slow start early.
+
+For comparison, the full results for an L4S run with the modified pacing are
+[here](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-12T021200-pacing-100).
+Please file an [Issue](https://github.com/heistp/sce-l4s-bakeoff/issues) if
+there are any concerns with this.
 
 
 ## Test Output
@@ -249,8 +252,8 @@ Each scenario is run first with one flow, then with two flows
 (the second flow beginning after 10 seconds), and with the following
 variations:
 
-- RTT delays of 0ms, 10ms and 80ms
-- Different CC algorithms as appropriate
+- netem induced RTT delays of 0ms, 10ms and 80ms
+- different CC algorithms as appropriate
 
 Full results obtained at the SCE Data Center in Portland are available
 [here](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/).
@@ -297,6 +300,26 @@ Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/ba
   [:exclamation:](#l4s-under-utilization) For L4S, we see intermittent
   under-utilization on this test.
 
+  :information_source: One common question here, and elsewhere, is why does
+  ICMP RTT drop a bit when the TCP flow is active. The following explanation
+  from Rodney Grimes helps explains this:
+
+  > The most common cause that ICMP or for that matter any RTT goes down
+  > when an interfaces transistions from idle to underload is that often
+  > these devices are running in a mode that says only interrupt the CPU
+  > when you have work (and work is usually a BUNCH of packets) for it
+  > to do, otherwise wake the CPU in some time t (or the CPU may be set
+  > to poll the device at some interval t).  So what you get when idle
+  > is your ping or single packet type RTT is driven by this poll/interval
+  > interrupt, but when you start sending traffic the device does have
+  > work for the CPU and so the CPU gets woken up at intervals much
+  > less than t.
+  > 
+  > This is a commonly mis understood aspect of modern NIC hardware that
+  > uses large ring buffers, they are actually slow to respond when there
+  > are only a few packets per poll interval arriving, due to the wait 
+  > for the end of the interval.
+
 - [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s1-1/batch-sce-s1-1-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-1/batch-l4s-s1-1-prague-50Mbit-80ms_fixed.png), single Reno-SCE and Prague flows at 80ms
 
   For SCE, Reno-SCE shows a faster ramp during slow start, because while NewReno
@@ -337,15 +360,17 @@ Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/ba
 - [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s1-2/batch-sce-s1-2-reno-sce-vs-reno-sce-50Mbit-80ms_fixed.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/batch-l4s-s1-2-prague-vs-prague-50Mbit-80ms_fixed.png), Reno-SCE vs Reno-SCE and Prague vs Prague at 80ms
 
   Noting that this is a single queue, Reno-SCE shows throughput fairness,
-  with convergence in about 25 seconds at 80ms. Convergence time drops to a
-  second or two at
+  with convergence on the order of 30 seconds (varies) at 80ms. Convergence
+  time drops to a second or two at
   [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/sce-s1-2/batch-sce-s1-2-reno-sce-vs-reno-sce-50Mbit-10ms_fixed.png).
 
   [:exclamation:](#l4s-dualpi2-unfairness)  We are not seeing throughput
   fairness for TCP Prague vs itself at any of the tested RTTs: 
   [0ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/batch-l4s-s1-2-prague-vs-prague-50Mbit-0ms_fixed.png),
   [10ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/batch-l4s-s1-2-prague-vs-prague-50Mbit-10ms_fixed.png), or
-  [80ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/batch-l4s-s1-2-prague-vs-prague-50Mbit-80ms_fixed.png)
+  [80ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T045427-r1/l4s-s1-2/batch-l4s-s1-2-prague-vs-prague-50Mbit-80ms_fixed.png).
+  We note here that fairness seems to stabilize at 80/20 in favor of
+  either flow, sometimes alternating between one flow and the other.
  
 
 ### Scenario 2
@@ -677,16 +702,22 @@ and [80ms](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-09-13T0
 ### SCE Single Queue Non-SCE Unfairness
 
 Because SCE is marked at lower queue depths than CE, non-SCE flows will
-outcompete SCE flows in a single queue without either changes to the
-SCE marking ramp,
-[presented at IETF 105](https://datatracker.ietf.org/meeting/105/materials/slides-105-tsvwg-sessa-61-some-congestion-experienced-00),
-or the proposed
-[Lightweight Fair Queueing](https://tools.ietf.org/html/draft-morton-tsvwg-lightweight-fair-queueing-00).
+outcompete SCE flows in a single queue without a change to the SCE marking
+ramp, as
+[presented at IETF 105](https://datatracker.ietf.org/meeting/105/materials/slides-105-tsvwg-sessa-61-some-congestion-experienced-00).
+This is effective, however it trades off some of the benefits of SCE, and
+requires tuning, which may be dependent on the link or traffic conditions.
 
-Changing the marking ramp is effective, but can require some tuning. The
-use of FQ is also effective, but has caused some controversy because of a
-perception that FQ can do harm to periodic bursty flows. For this reason,
-the SCE team continues to explore alternative solutions to this challenge.
+Another solution is fair queueing. One of the arguments against this is
+the resource requirements for fair queueing, which led to the proposed
+[Lightweight Fair Queueing](https://tools.ietf.org/html/draft-morton-tsvwg-lightweight-fair-queueing-00).
+Another argument is the perception that FQ can do harm to periodic bursty
+flows, however we have not yet shown this to be the case with hard evidence,
+and the SCE team is in general in favor of FQ.
+
+We continue to explore alternative solutions to this challenge, and will seek
+to quantify any potential side effects of FQ, however this is a decades old
+debate that may not be resolved any time soon.
 
 ## List of L4S Issues
 
@@ -700,10 +731,12 @@ corrections.
 
 We sometimes see link under-utilization for either DCTCP or TCP Prague
 when used with dualpi2. This may be accompanied by occasional steps up in
-throughput. See [Scenario 1](#scenario-1). One possible cause for this
-could be Flent's simultaneous ping measurement flow, but the drops in
-utilization we sometimes see (50%, for example) are larger than might
-be expected from that.
+throughput. See [Scenario 1](#scenario-1).
+
+One possible cause for this could be Flent's simultaneous ping measurement flow,
+but the drops in utilization we sometimes see (50%, for example) are larger than
+might be expected from that. Another possibility is that the early CE marking in
+dualpi2 might lead to this in some conditions.
 
 ### L4S Dualpi2 Unfairness
 
@@ -896,7 +929,8 @@ sudo make install
 Edit `bakeoff.batch` to change any settings at the top of the file to
 suit your environment. Note that:
 
-- Flent is run as root so it can manually set the CC algorithm.
+- Flent is run with sudo so it can manually set the CC algorithm, and so that
+  TCP stats polled with the ss utility are available.
 - In order to set up and tear down the test nodes, the root user must have
   ssh access to each of the nodes without a password.
 - The user used for management on each node must have sudo access without
@@ -908,13 +942,19 @@ The file `run.sh` may be used to run some or all of the tests. Run it
 without an argument for usage. A typical invocation which runs all SCE tests:
 
 ```
-run.sh sce
+./run.sh sce
+```
+
+Run scenarios 5 and 6 (regex accepted):
+
+```
+./run.sh "sce-s[5-6]"
 ```
 
 Show all L4S tests that would be run:
 
 ```
-run.sh l4s dry
+./run.sh l4s dry
 ```
 
 `runbg.sh` runs tests in the background, allowing the user to log out.
