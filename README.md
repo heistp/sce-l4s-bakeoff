@@ -995,6 +995,9 @@ This is what we plan to do next:
 - Add a scenario with a sudden capacity increase, then decrease
 - Add a scenario with a sudden RTT increase, then decrease
 - Add a scenario with a simulated bursty link using netem slotting
+- Add a scenario with bi-directional traffic (start with rrul_be)
+- Add a few asymmetric link scenarios, at least one where the reduced
+  ACK rate limits throughput
 
 ### Inbox
 
@@ -1006,11 +1009,9 @@ the future:
 - Very high and very low bandwidths
 - Very high and very low RTTs
 - Bottleneck shifts (SCE to non-SCE, DualQ to 3168)
-- Asymmetric links, including highly asymmetric (> 25:1)
-- Asymmetric delays
 - Multipath routing
 - More flows
-- Bi-directional traffic
+- Asymmetric delays
 - RED AQM
 
 
