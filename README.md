@@ -992,9 +992,9 @@ Syncs files between C1 and C2, e.g.
 
 This is what we plan to do next:
 
-- Add a scenario with a sudden capacity increase, then decrease
-- Add a scenario with a sudden RTT increase, then decrease
 - Add a scenario with a simulated bursty link using netem slotting
+- Add a scenario with a sudden RTT increase, then decrease
+- Add a scenario with a sudden capacity increase, then decrease
 - Add a scenario with bi-directional traffic (start with rrul_be)
 - Add a few asymmetric link scenarios, at least one where the reduced
   ACK rate limits throughput
