@@ -30,11 +30,11 @@ send_pushover() {
 	local r=$1
 	local sound
 	local msg
-	
+
 	stohms() {
 		date -d@$1 -u +%H:%M:%S
 	}
-	
+
 	if [ $r -eq 0 ]; then
 		sound=$pushover_sound_success
 		msg="Flent run successful in $(stohms $SECONDS)!"
@@ -42,10 +42,10 @@ send_pushover() {
 		sound=$pushover_sound_failure
 		msg="Flent run failed in $(stohms $SECONDS)."
 	fi
-	
+
 	if [ "$pushover_user" != "" ]; then
 		response=$(/usr/bin/curl -s --retry 3 --form-string token=$pushover_token --form-string user=$pushover_user --form-string "sound=$sound" --form-string "message=$msg" https://api.pushover.net/1/messages.json)
-	
+
 		if [[ ! "$response" == *"\"status\":1"* ]]; then
 			echo "$response"
 		fi
