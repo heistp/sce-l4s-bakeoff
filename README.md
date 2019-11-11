@@ -713,11 +713,6 @@ prague, prague vs cubic (reversed flow start order) was also run.
 - In [scenario 1](#scenario-1), TCP Prague vs Cubic now does converge to
   fairness, but appears to have fairly long convergence times (~40s at 80ms
   RTT). Convergence times in other scenarios are similarly long.
-- In several scenarios, at first glance the previously reported L4S interaction
-  with CoDel seemed to have been fixed, but by reversing the flow start order
-  (prague vs cubic instead of cubic vs prague), we can see that although the TCP
-  RTT spikes no longer occur at flow start, they are still present when a second
-  flow is introduced after slow-start exit.
 - In [scenario 2](#scenario-2), [scenario 5](#scenario-5) and
   [scenario 6](#scenario-6), the previously reported L4S interaction with CoDel
   seems to be partially, but not completely fixed. By reversing the flow start
