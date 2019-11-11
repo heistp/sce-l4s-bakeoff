@@ -709,18 +709,26 @@ published with the tag `testing/5-11-2019`. Also, in addition to cubic vs
 prague, prague vs cubic (reversed flow start order) was also run.
 
 - In [scenario 1](#scenario-1) and elsewhere, the previously reported
-  intermittent TCP Prague utilization issues appear to have been fixed.
+  intermittent TCP Prague utilization issues appear to be fixed.
 - In [scenario 1](#scenario-1), TCP Prague vs Cubic now does converge to
-  fairness, but after ~40 seconds.
+  fairness, but appears to have fairly long convergence times (~40s at 80ms
+  RTT). Convergence times in other scenarios are similarly long.
 - In several scenarios, at first glance the previously reported L4S interaction
   with CoDel seemed to have been fixed, but by reversing the flow start order
   (prague vs cubic instead of cubic vs prague), we can see that although the TCP
   RTT spikes no longer occur at flow start, they are still present when a second
   flow is introduced after slow-start exit.
-- In [scenario 3](#scenario-3), the previously reported L4S CE unfairness
-  between TCP Prague and Cubic grew larger, from ~4x to ~7.5x. With single queue
-  `htb+fq_codel` as the bottleneck at 10ms, TCP Prague's median throughput is
-  calculated at 44.25Mbit, while Cubic's is around 5.78Mbit.
+- In [scenario 2](#scenario-2), [scenario 5](#scenario-5) and
+  [scenario 6](#scenario-6), the previously reported L4S interaction with CoDel
+  seems to be partially, but not completely fixed. By reversing the flow start
+  order (prague vs cubic instead of cubic vs prague, second flow delayed by 10
+  seconds), we can see that while the TCP RTT spikes no longer occur at flow
+  start, they are still present when a second flow is introduced after
+  slow-start exit.
+- In [scenario 3](#scenario-3) (single queue AQM at 10ms RTT), the previously
+  reported unfairness between TCP Prague and Cubic grew larger, from ~4.1x
+  (40.55/9.81Mbit) to ~7.7x (44.25/5.78Mbit). This change appears to be
+  consistent at other RTT delays in the same scenario (0ms and 80ms).
 
 ## Installation
 
