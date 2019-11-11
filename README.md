@@ -727,7 +727,7 @@ prague, prague vs cubic (reversed flow start order) was also run.
   slow-start exit.
 - In [scenario 3](#scenario-3) (single queue AQM at 10ms RTT), the previously
   reported unfairness between TCP Prague and Cubic grew larger, from ~4.1x
-  (40.55/9.81Mbit) to ~7.7x (44.25/5.78Mbit). This change appears to be
+  (40.55/9.81Mbit) to ~7.7x (44.25/5.78Mbit). This trend appears to be
   consistent at other RTT delays in the same scenario (0ms and 80ms).
 
 ## Installation
