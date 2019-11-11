@@ -136,14 +136,16 @@ abstract = yes
 inherits = two-flow, l4s
 for_vs = cubic-vs-cubic,
 	prague-vs-prague,
-	cubic-vs-prague
+	cubic-vs-prague,
+	prague-vs-cubic
 
 [Batch::two-flow-sce]
 abstract = yes
 inherits = two-flow, sce
 for_vs = cubic-vs-cubic,
 	reno-sce-vs-reno-sce,
-	cubic-vs-reno-sce
+	cubic-vs-reno-sce,
+	reno-sce-vs-cubic
 
 ##########
 #
