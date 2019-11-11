@@ -583,11 +583,11 @@ Full results: [SCE one-flow](https://www.heistp.net/downloads/sce-l4s-bakeoff/ba
   [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-11-11T090559-r2/l4s-s5-2/batch-l4s-s5-2-prague-vs-cubic-50Mbit-80ms_fixed.png),
   Reno-SCE vs Cubic or Prague vs Cubic at 80ms
 
-- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-11-11T090559-r2/sce-s5-2/batch-sce-s5-2-reno-sce-vs-reno-sce-50Mbit-80ms_var.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-11-11T090559-r2/l4s-s5-2/batch-l4s-s5-2-prague-vs-prague-50Mbit-80ms_var.png), Reno-SCE vs Reno-SCE or Prague vs Prague at 80ms, variable RTT scaling
-
   [:exclamation:](#l4s-codel-interaction) When the flow order is reversed,
   so that TCP Prague is after its slow-start exit, we see an ~50ms TCP RTT
   spike that lasts around 4 seconds.
+
+- [SCE](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-11-11T090559-r2/sce-s5-2/batch-sce-s5-2-reno-sce-vs-reno-sce-50Mbit-80ms_var.png) vs [L4S](https://www.heistp.net/downloads/sce-l4s-bakeoff/bakeoff-2019-11-11T090559-r2/l4s-s5-2/batch-l4s-s5-2-prague-vs-prague-50Mbit-80ms_var.png), Reno-SCE vs Reno-SCE or Prague vs Prague at 80ms, variable RTT scaling
 
 ### Scenario 6
 
